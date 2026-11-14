@@ -1,1 +1,56 @@
-[]
+[
+  {
+    "d": "2026-11-12",
+    "ts": "2026-11-14T18:10:00Z",
+    "c": "Business",
+    "t": "BofA : GTA VI doit rapporter au moins 1,9 milliard de dollars pour satisfaire les investisseurs",
+    "s": "Bank of America estime ce seuil nécessaire pour tenir les attentes de l'exercice 2027 de Take-Two, et s'attend à de premiers chiffres de ventes d'ici le 23 novembre. Sensor Tower évalue les précommandes à plus de 11 millions d'unités.",
+    "sn": "Stocktwits (via Yahoo Finance)",
+    "su": "https://finance.yahoo.com/markets/stocks/articles/gta-vi-needs-hit-1-174416394.html"
+  },
+  {
+    "d": "2026-11-13",
+    "ts": "2026-11-14T18:10:00Z",
+    "c": "Lancement",
+    "t": "Codes des boîtes physiques lisibles à la lampe ? GamesRadar relativise le risque",
+    "s": "Les boîtes de GTA VI contiennent un code imprimé sous la jaquette, que certains disaient visible à travers l'emballage avec une lampe. GamesRadar n'y est pas parvenu sur ses copies américaine et britannique grâce à une bande de camouflage, même si certaines versions semblent moins protégées.",
+    "sn": "GamesRadar+",
+    "su": "https://www.gamesradar.com/games/grand-theft-auto/we-tried-stealing-our-own-gta-6-physical-edition-codes-and-you-probably-shouldnt-worry-about-someone-getting-to-yours-first/"
+  },
+  {
+    "d": "2026-11-13",
+    "ts": "2026-11-14T17:15:00Z",
+    "c": "Business",
+    "t": "Selon Bloomberg, le multijoueur de GTA VI n'arriverait qu'un an après le lancement",
+    "s": "Une vidéo de Bloomberg sur le coût du développement évoque un volet en ligne prévu environ un an après la sortie, soit en 2027. Rockstar, qui présente le jeu du 19 novembre comme une expérience solo, n'a encore rien annoncé.",
+    "sn": "VICE",
+    "su": "https://www.vice.com/en/article/gta-6-online-release-window-bloomberg/"
+  },
+  {
+    "d": "2026-11-13",
+    "ts": "2026-11-14T17:15:00Z",
+    "c": "Mise à jour",
+    "t": "Une première mise à jour 1.002 d'environ 1 Go arrive sur PS5 avant la sortie",
+    "s": "Repérée par PlayStation Game Size, la version 1.002 est déployée par vagues sur PS5 et pourrait être le patch du premier jour. Rockstar n'a publié aucune note de mise à jour pour l'instant.",
+    "sn": "VICE",
+    "su": "https://www.vice.com/en/article/gta-6-day-one-patch-ps5-version-1002/"
+  },
+  {
+    "d": "2026-11-13",
+    "ts": "2026-11-14T17:15:00Z",
+    "c": "Communauté",
+    "t": "Twitch offrira chaque jour des codes de GTA VI Édition Ultime jusqu'à fin novembre",
+    "s": "Annoncés lors de la TwitchCon 2026, des tirages quotidiens de copies numériques de l'Édition Ultime auront lieu du 19 au 30 novembre pour les spectateurs de streams GTA VI. Des badges thématiques à collectionner sont aussi prévus.",
+    "sn": "Shacknews",
+    "su": "https://www.shacknews.com/article/151356/twitch-gta-6-ultimate-edition-code-drop-twitchcon-2026"
+  },
+  {
+    "d": "2026-11-14",
+    "ts": "2026-11-14T16:10:00Z",
+    "c": "Lancement",
+    "t": "GTA VI pourrait bousculer le streaming… et les congés",
+    "s": "Créateurs, plateformes de streaming, livraison de repas et tourisme à Miami pourraient tous ressentir l'effet du lancement. Près d'un salarié sur cinq (aux États-Unis) prévoit de poser un congé pour l'occasion.",
+    "sn": "CNBC",
+    "su": "https://www.cnbc.com/2026/11/14/gta-6-grand-theft-auto-launch.html"
+  }
+]
