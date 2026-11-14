@@ -13,21 +13,24 @@ En ligne : https://xezy-b2.github.io/vice-hub/
 | Profil, missions, watchlist | Navigateur uniquement | ✅ Compte en ligne, multi-appareils |
 | Classement communauté | — | ✅ |
 
-## Activer les comptes joueurs (Supabase, gratuit)
+## Comptes joueurs (Supabase)
 
-1. Crée un projet sur https://supabase.com (offre gratuite).
-2. **SQL Editor → New query** : colle le contenu de [`supabase/schema.sql`](supabase/schema.sql) puis **Run**.
-3. **Authentication → URL Configuration** :
-   - *Site URL* : `https://xezy-b2.github.io/vice-hub/`
-   - *Redirect URLs* : ajoute `https://xezy-b2.github.io/vice-hub/`
-4. **Project Settings → API** : copie la *Project URL* et la clé *anon public*.
-5. Dans `index.html`, renseigne-les dans le bloc `CFG` en haut du script :
-   ```js
-   const CFG = { supabaseUrl: "https://xxxx.supabase.co", supabaseAnonKey: "eyJ..." };
-   ```
-   La clé *anon* est faite pour être publique : la sécurité repose sur les règles RLS du schéma (chacun ne lit/écrit que ses propres données ; le classement est lisible par tous).
+Le site est branché sur le projet Supabase **vice-hub** (`saulgajlglwqmpehytlm`, région Paris).
 
-La connexion se fait par lien magique envoyé par e-mail (aucun mot de passe).
+- Inscription avec **pseudo unique**, e-mail et mot de passe (indicateur de robustesse), connexion, mot de passe oublié, connexion par lien e-mail
+- Espace **Compte** : avatar, couleur, bio, changement de pseudo / e-mail / mot de passe, déconnexion (ou de tous les appareils), **suppression du compte**
+- **Profils publics** consultables depuis le classement
+- Connexion Discord / Twitch / Google prête : active le fournisseur dans Supabase puis ajoute-le dans `CFG.oauth`
+
+### Mise en place (une seule fois)
+
+1. **SQL Editor → New query** : colle [`supabase/schema.sql`](supabase/schema.sql) puis **Run**.
+2. **Authentication → URL Configuration** : *Site URL* et *Redirect URLs* = `https://xezy-b2.github.io/vice-hub/`
+3. **E-mails** : le service d'e-mail inclus dans Supabase n'envoie qu'aux membres de l'équipe du projet. Pour un site public :
+   - soit **Authentication → Sign In / Providers → Email → désactive « Confirm email »** (inscription immédiate) ;
+   - soit configure un SMTP (ex. [Resend](https://resend.com/docs/send-with-supabase-smtp)) dans **Authentication → Emails → SMTP Settings** — nécessaire aussi pour « mot de passe oublié » et la connexion par lien.
+
+La clé `sb_publishable_…` présente dans `index.html` est publique par conception : la sécurité repose sur les règles RLS du schéma.
 
 ## Actualités
 
