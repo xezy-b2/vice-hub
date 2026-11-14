@@ -316,13 +316,14 @@ tr.clk{cursor:pointer}tr.clk:hover td{background:rgba(255,255,255,.03)}
 <!-- PROFIL -->
 <section class="view" id="v-profil">
   <h1 class="page display">Mon profil joueur</h1>
-  <p class="sub">Ta carte de joueur GTA VI. Tout est sauvegardé automatiquement sur ton compte.</p>
+  <p class="sub">Ta carte de joueur GTA VI, liée à ton compte VICE HUB.</p>
+  <div id="profLink" style="margin:-8px 0 18px"></div>
   <div class="grid g2" style="grid-template-columns:1fr 1.25fr">
     <div class="card" id="idCard"></div>
     <div class="card">
       <h3 style="margin-bottom:14px">Modifier mon profil</h3>
       <form id="profileForm" class="grid g2" style="gap:12px">
-        <div><label class="f">Pseudo</label><input name="pseudo" maxlength="24" placeholder="ViceKing_33"></div>
+        <div><label class="f">Pseudo</label><input name="pseudo" maxlength="24" placeholder="ViceKing_33"><div class="hint" id="pseudoHint"></div></div>
         <div><label class="f">Plateforme</label><select name="plateforme"><option>PS5</option><option>PS5 Pro</option><option>Xbox Series X</option><option>Xbox Series S</option></select></div>
         <div><label class="f">Édition</label><select name="edition"><option>Standard</option><option>Ultimate</option></select></div>
         <div><label class="f">Protagoniste préféré</label><select name="perso"><option>Lucia</option><option>Jason</option><option>Les deux</option></select></div>
@@ -639,16 +640,20 @@ function renderVideos(){
 }
 function renderProfile(){
   const p=S.profile,st=stats(),f=$("#profileForm");
-  const pin=f.elements.pseudo;if(backend==="supabase"&&uid){pin.disabled=true;pin.title="Le pseudo se modifie dans l'onglet Compte"}else{pin.disabled=false;pin.title=""}
+  const pin=f.elements.pseudo;if(backend==="supabase"&&uid){pin.disabled=true;pin.title="Le pseudo se modifie dans l'onglet Compte";$("#pseudoHint").innerHTML='Pseudo de ton compte · <a href="#compte" data-go="compte">modifier</a>'}else{pin.disabled=false;pin.title="";$("#pseudoHint").textContent=backend==="supabase"?"Il sera proposé comme pseudo à la création de ton compte.":""}
   if(document.activeElement?.form!==f){
     for(const k of Object.keys(p)){const el=f.elements[k];if(!el)continue;if(el.type==="checkbox")el.checked=!!p[k];else el.value=p[k]??""}
   }
-  const ini=(p.pseudo||"?").slice(0,2).toUpperCase();
+  const ini=(p.pseudo||"?").slice(0,2).toUpperCase(),linked=backend==="supabase"&&uid&&ACC;
+  const L=$("#profLink");
+  if(backend==="supabase"&&!uid)L.innerHTML=`<div class="notice row" style="justify-content:space-between;gap:12px"><span>⚠️ Ton profil n'est <b>pas lié à un compte</b> : il est seulement enregistré dans ce navigateur. Crée ton compte ou connecte-toi pour le sauvegarder et le retrouver partout.</span><span class="row" style="gap:8px"><button class="btn sm pri" data-acct-go="signup">Créer mon compte</button><button class="btn sm" data-acct-go="login">Se connecter</button></span></div>`;
+  else if(linked)L.innerHTML=`<div class="notice t row" style="justify-content:space-between;gap:12px"><span class="row" style="gap:10px;flex-wrap:nowrap">${avatarHtml(ACC.avatar,ACC.color,30)}<span>Profil lié au compte <b>${esc(ACC.username)}</b> · ${esc(sbEmail)} · <span style="color:var(--green)">synchronisé</span></span></span><button class="btn sm" data-go="compte">Gérer mon compte</button></div>`;
+  else L.innerHTML="";
   $("#idCard").innerHTML=`
    <div style="border-radius:14px;padding:20px;background:linear-gradient(160deg,#2b0f4a,#7a1a5e 55%,#ff5a6e);position:relative;overflow:hidden">
     <div class="small" style="letter-spacing:.2em;font-weight:800;color:#ffd9e8">ÉTAT DE LEONIDA · PERMIS DE JOUEUR</div>
     <div class="row" style="margin-top:14px;gap:16px;align-items:center">
-      <div class="av display" style="width:74px;height:74px;font-size:34px;background:var(--grad);border-radius:16px">${esc(ini)}</div>
+      ${linked?`<div class="av" style="width:74px;height:74px;font-size:38px;background:${esc(ACC.color)};border-radius:16px">${esc(ACC.avatar)}</div>`:`<div class="av display" style="width:74px;height:74px;font-size:34px;background:var(--grad);border-radius:16px">${esc(ini)}</div>`}
       <div><div class="display" style="font-size:40px;line-height:1">${esc(p.pseudo||"Joueur anonyme")}</div><div class="small" style="color:#ffe2ef">${esc(p.plateforme)} · Édition ${esc(p.edition)} · Team ${esc(p.perso)}</div></div>
     </div>
     ${p.bio?`<p class="small" style="margin-top:12px;color:#fff">« ${esc(p.bio)} »</p>`:""}
@@ -737,9 +742,10 @@ function missionModal(m){
 
 /* ---------------- EVENTS ---------------- */
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-acct],[data-oauth],[data-pp],[data-tw],[data-play],[data-go],[data-nc],[data-mc],[data-cyc],[data-edm],[data-delm],[data-reg],[data-lch],[data-delstr],[data-seen],[data-delvid],[data-add-m]");
+  const t=e.target.closest("[data-acct-go],[data-acct],[data-oauth],[data-pp],[data-tw],[data-play],[data-go],[data-nc],[data-mc],[data-cyc],[data-edm],[data-delm],[data-reg],[data-lch],[data-delstr],[data-seen],[data-delvid],[data-add-m]");
   if(!t)return;const d=t.dataset;
-  if(d.acct){e.preventDefault();accTab=d.acct;renderAccount()}
+  if(d.acctGo){accTab=d.acctGo;renderAccount();go("compte")}
+  else if(d.acct){e.preventDefault();accTab=d.acct;renderAccount()}
   else if(d.oauth){sb.auth.signInWithOAuth({provider:d.oauth,options:{redirectTo:BASE}}).then(({error})=>{if(error)toast(frErr(error))})}
   else if(d.pp){publicProfile(d.pp)}
   else if(d.tw){playTwitch(d.tw)}
@@ -771,7 +777,8 @@ $("#profileForm").addEventListener("submit",e=>{e.preventDefault();const f=e.tar
   for(const k of Object.keys(p)){const el=f.elements[k];if(!el||el.disabled)continue;p[k]=el.type==="checkbox"?el.checked:el.value.trim()}
   if(backend==="supabase"&&!uid&&p.public){toast("Crée un compte pour apparaître au classement");p.public=false}
   if(p.public&&!p.pseudo){toast("Choisis un pseudo pour apparaître au classement");p.public=false}
-  document.activeElement?.blur();save();toast("Profil enregistré");$("#profMsg").textContent="Enregistré ✓";setTimeout(()=>$("#profMsg").textContent="",2000)});
+  if(backend==="supabase"&&uid&&ACC){sb.from("profiles").update({bio:String(p.bio||"").slice(0,160),plateforme:String(p.plateforme||"").slice(0,30),perso:String(p.perso||"").slice(0,30)}).eq("id",uid).select().single().then(({data})=>{if(data){ACC=data;renderProfile()}})}
+  document.activeElement?.blur();save();toast(backend==="supabase"&&uid?"Profil enregistré sur ton compte":"Profil enregistré");$("#profMsg").textContent="Enregistré ✓";setTimeout(()=>$("#profMsg").textContent="",2000)});
 $("#exportBtn").onclick=async()=>{const txt=JSON.stringify(S);try{await navigator.clipboard.writeText(txt);toast("Sauvegarde copiée dans le presse-papiers")}catch(e){modal(`<h3>Ta sauvegarde</h3><p class="small muted" style="margin:6px 0 10px">Sélectionne et copie ce texte.</p><textarea rows="8" readonly onclick="this.select()">${esc(txt)}</textarea><div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" data-close>Fermer</button></div>`)}};
 $("#importBtn").onclick=()=>modal(`<h2 class="display" style="margin:0 0 10px">Importer une sauvegarde</h2><form class="grid" style="gap:12px"><textarea name="j" rows="8" required placeholder="Colle ici ta sauvegarde…"></textarea><div class="row" style="justify-content:flex-end"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn pri">Importer</button></div></form>`,fd=>{try{S=norm(JSON.parse(fd.get("j")));save();toast("Sauvegarde importée")}catch(e){toast("Sauvegarde invalide");return false}});
 $("#resetBtn").onclick=()=>{modal(`<h3>Tout réinitialiser ?</h3><p class="small muted" style="margin:8px 0 16px">Profil, missions, streamers et watchlist seront effacés.</p><div class="row" style="justify-content:flex-end"><button class="btn ghost" data-close>Annuler</button><button class="btn pri" id="cfr">Réinitialiser</button></div>`);$("#cfr").onclick=()=>{S=DEFAULT();save();$("#modal").classList.remove("on");toast("Données réinitialisées")}};
@@ -848,7 +855,7 @@ function renderAuthForms(B){
     <div class="row small" style="justify-content:space-between"><a href="#compte" data-acct="forgot">Mot de passe oublié ?</a><a href="#compte" data-acct="magic">Connexion par lien e-mail</a></div>
     <p class="hint bad" id="fMsg"></p></form>`;
   else if(accTab==="signup")form=`<form id="fSignup" class="grid" style="gap:12px" autocomplete="on">
-    <div><label class="f">Pseudo</label><input name="username" required maxlength="20" autocomplete="username" placeholder="ViceKing_33"><div class="hint" id="unHint"></div></div>
+    <div><label class="f">Pseudo</label><input name="username" required maxlength="20" autocomplete="username" placeholder="ViceKing_33" value="${esc(/^[A-Za-z0-9_]{3,20}$/.test(S.profile.pseudo||"")?S.profile.pseudo:"")}"><div class="hint" id="unHint"></div></div>
     <div><label class="f">E-mail</label><input name="email" type="email" required autocomplete="email" placeholder="toi@exemple.fr"></div>
     <div><label class="f">Mot de passe</label><div class="row" style="flex-wrap:nowrap"><input name="pw" type="password" required minlength="8" autocomplete="new-password" placeholder="8 caractères minimum"><button type="button" class="btn sm ghost" data-showpw>👁</button></div><div class="pwbar"><i id="pwBar"></i></div><div class="hint" id="pwLab"></div></div>
     <div><label class="f">Confirmer le mot de passe</label><input name="pw2" type="password" required autocomplete="new-password"></div>
@@ -927,7 +934,7 @@ function renderDashboard(B){
     try{if(un.toLowerCase()!==(a.username||"").toLowerCase()){if(!/^[A-Za-z0-9_]{3,20}$/.test(un))throw new Error("Pseudo invalide : 3 à 20 caractères (lettres, chiffres, _).");const {data}=await sb.rpc("username_available",{name:un});if(!data)throw new Error("Ce pseudo est déjà pris.")}
       const upd={username:un,avatar:pick.avatar,color:pick.color,bio:fp.elements.bio.value.trim().slice(0,160)};
       const {data,error}=await sb.from("profiles").update(upd).eq("id",uid).select().single();if(error)throw error;
-      ACC=data;S.profile.pseudo=ACC.username;S.profile.bio=ACC.bio;save();m.className="hint ok";m.textContent="✓ Profil mis à jour";renderAuth();setTimeout(()=>renderAccount(),900)}
+      ACC=data;S.profile.pseudo=ACC.username;S.profile.bio=ACC.bio;save();renderProfile();m.className="hint ok";m.textContent="✓ Profil mis à jour";renderAuth();setTimeout(()=>renderAccount(),900)}
     catch(err){m.className="hint bad";m.textContent=frErr(err)}};
   $("#fEmail").onsubmit=async e=>{e.preventDefault();const m=$("#emMsg");try{const {error}=await sb.auth.updateUser({email:e.target.elements.email.value.trim()},{emailRedirectTo:BASE});if(error)throw error;m.className="hint ok";m.textContent="📧 Confirme le changement via les liens envoyés à tes adresses.";e.target.reset()}catch(err){m.className="hint bad";m.textContent=frErr(err)}};
   const fw=$("#fPw");bindPw(fw.elements.pw,$("#pwBar2"),$("#pwLab2"));
@@ -936,7 +943,7 @@ function renderDashboard(B){
   $("#bDel").onclick=()=>{modal(`<h2 class="display" style="margin:0 0 8px;color:#ff6b81">Supprimer mon compte</h2><p class="small muted">Cette action est <b>définitive</b> : ton compte, ta sauvegarde en ligne et ta place au classement seront effacés. Ta progression reste sur cet appareil.</p><form class="grid" style="gap:12px;margin-top:14px"><div><label class="f">Tape ton pseudo « ${esc(a.username)} » pour confirmer</label><input name="c" required autocomplete="off"></div><div class="row" style="justify-content:flex-end"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn danger" style="border-color:#ff2e4d;color:#ff6b81">Supprimer définitivement</button></div><p class="hint bad" id="delMsg"></p></form>`,fd=>{
     if(String(fd.get("c")).trim()!==a.username){$("#delMsg").textContent="Le pseudo ne correspond pas.";return false}
     const oldId=uid;sb.rpc("delete_my_account").then(async({error})=>{if(error){$("#delMsg").textContent=frErr(error);return}$("#modal").classList.remove("on");try{await sb.auth.signOut({scope:"local"})}catch(e){}uid=null;ACC=null;sbUser=null;LB=LB.filter(r=>r.id!==oldId);renderAuth();renderAccount();fetchLB();toast("Compte supprimé")});return false})}}
-async function doSignOut(scope){try{await sb.auth.signOut({scope})}catch(e){}uid=null;ACC=null;sbUser=null;sbEmail="";renderAuth();renderAccount();renderLB();setSave("warn","Non connecté · sauvegarde locale");toast(scope==="global"?"Déconnecté de tous les appareils":"Déconnecté")}
+async function doSignOut(scope){try{await sb.auth.signOut({scope})}catch(e){}uid=null;ACC=null;sbUser=null;sbEmail="";renderAuth();renderAccount();renderLB();renderProfile();setSave("warn","Non connecté · sauvegarde locale");toast(scope==="global"?"Déconnecté de tous les appareils":"Déconnecté")}
 function recoveryModal(){modal(`<h2 class="display" style="margin:0 0 8px">Nouveau mot de passe</h2><p class="small muted">Choisis un nouveau mot de passe pour ton compte.</p><form class="grid" style="gap:12px;margin-top:12px"><div><input name="pw" type="password" required autocomplete="new-password" placeholder="Nouveau mot de passe" id="rpw"><div class="pwbar"><i id="rBar"></i></div><div class="hint" id="rLab"></div></div><input name="pw2" type="password" required autocomplete="new-password" placeholder="Confirmer"><button class="btn pri">Enregistrer</button><p class="hint bad" id="rMsg"></p></form>`,fd=>{
   const pw=String(fd.get("pw")),pw2=String(fd.get("pw2")),m=$("#rMsg");
   if(pw.length<8||pwScore(pw)<2){m.textContent="Mot de passe trop faible.";return false}if(pw!==pw2){m.textContent="Les deux mots de passe ne correspondent pas.";return false}
@@ -952,7 +959,7 @@ async function publicProfile(id){
     <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Fermer</button></div>`)}
 async function sbSession(session){
   const prev=uid;uid=session&&session.user?session.user.id:null;sbUser=session?session.user:null;sbEmail=sbUser?sbUser.email||"":"";
-  if(!uid){ACC=null;renderAuth();renderAccount();setSave("warn","Non connecté · sauvegarde locale");renderLB();return}
+  if(!uid){ACC=null;renderAuth();renderAccount();renderProfile();setSave("warn","Non connecté · sauvegarde locale");renderLB();return}
   if(prev===uid){renderAuth();return}
   setSave("","Synchronisation…");
   try{
