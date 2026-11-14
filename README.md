@@ -34,9 +34,20 @@ Le site est branché sur le projet Supabase **vice-hub** (`saulgajlglwqmpehytlm`
 
 La clé `sb_publishable_…` présente dans `index.html` est publique par conception : la sécurité repose sur les règles RLS du schéma.
 
+
+### Lives Twitch (Edge Function `twitch-live`)
+
+1. Crée une application sur https://dev.twitch.tv/console/apps (catégorie *Website Integration*, URL de redirection : `https://saulgajlglwqmpehytlm.supabase.co/auth/v1/callback`).
+2. Dans Supabase → **Edge Functions → Secrets**, ajoute `TWITCH_CLIENT_ID` et `TWITCH_CLIENT_SECRET`.
+3. La section « En direct sur GTA VI » et les badges « EN DIRECT » des favoris s'activent automatiquement.
+
+### Connexion Discord / Twitch
+
+Active le fournisseur dans **Authentication → Sign In / Providers** (même URL de redirection que ci-dessus), puis ajoute-le dans `CFG.oauth` (`["discord","twitch"]`).
+
 ## Actualités
 
-`news.json` est un tableau d'objets :
+Les actus sont dans la table Supabase `news` (remplie toutes les heures). `news.json` reste lu en complément, au format :
 ```json
 { "d": "2026-11-14", "ts": "2026-11-14T16:10:00Z", "c": "Lancement", "t": "Titre", "s": "Résumé", "sn": "Média", "su": "https://…" }
 ```
