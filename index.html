@@ -184,11 +184,10 @@ tr.clk{cursor:pointer}tr.clk:hover td{background:rgba(255,255,255,.03)}
       <button class="tab" data-go="actus">Actus</button>
       <button class="tab" data-go="streams">Streams</button>
       <button class="tab" data-go="videos">Vidéos</button>
-      <button class="tab" data-go="profil">Mon profil</button>
       <button class="tab" data-go="missions">Missions</button>
       <button class="tab" data-go="classement">Classement</button>
       <button class="tab" data-go="guide">Guide &amp; infos</button>
-      <button class="tab" data-go="compte" id="tabCompte" style="display:none">Compte</button>
+      <button class="tab" data-go="compte" id="tabCompte">Mon compte</button>
     </nav>
     <button class="btn sm authbtn" id="authBtn" style="display:none">Se connecter</button>
     <div class="savepill" id="savepill"><i class="dot" id="savedot"></i><span id="savetxt">Connexion…</span></div>
@@ -225,7 +224,7 @@ tr.clk{cursor:pointer}tr.clk:hover td{background:rgba(255,255,255,.03)}
       <p style="max-width:520px;font-weight:500;color:#fff4f8;margin-top:8px" id="heroLine">Sortie le jeudi 19 novembre 2026 sur PS5 et Xbox Series X|S, à minuit heure locale.</p>
       <div class="cd" id="countdown"></div>
       <div class="row" style="margin-top:14px">
-        <button class="btn pri" data-go="profil">Créer mon profil joueur</button>
+        <button class="btn pri" data-go="compte">Créer mon compte joueur</button>
         <button class="btn" data-go="missions" style="background:rgba(10,6,20,.55);border-color:rgba(255,255,255,.25)">Suivre mes missions</button>
       </div>
     </div>
@@ -313,41 +312,6 @@ tr.clk{cursor:pointer}tr.clk:hover td{background:rgba(255,255,255,.03)}
   <div id="watchList"></div>
 </section>
 
-<!-- PROFIL -->
-<section class="view" id="v-profil">
-  <h1 class="page display">Mon profil joueur</h1>
-  <p class="sub">Ta carte de joueur GTA VI, liée à ton compte VICE HUB.</p>
-  <div id="profLink" style="margin:-8px 0 18px"></div>
-  <div class="grid g2" style="grid-template-columns:1fr 1.25fr">
-    <div class="card" id="idCard"></div>
-    <div class="card">
-      <h3 style="margin-bottom:14px">Modifier mon profil</h3>
-      <form id="profileForm" class="grid g2" style="gap:12px">
-        <div><label class="f">Pseudo</label><input name="pseudo" maxlength="24" placeholder="ViceKing_33"><div class="hint" id="pseudoHint"></div></div>
-        <div><label class="f">Plateforme</label><select name="plateforme"><option>PS5</option><option>PS5 Pro</option><option>Xbox Series X</option><option>Xbox Series S</option></select></div>
-        <div><label class="f">Édition</label><select name="edition"><option>Standard</option><option>Ultimate</option></select></div>
-        <div><label class="f">Protagoniste préféré</label><select name="perso"><option>Lucia</option><option>Jason</option><option>Les deux</option></select></div>
-        <div><label class="f">Heures de jeu</label><input name="heures" type="number" min="0" step="0.5" placeholder="0"></div>
-        <div><label class="f">Argent en jeu ($)</label><input name="argent" type="number" min="0" step="1" placeholder="0"></div>
-        <div><label class="f">Style de jeu</label><select name="style"><option>Histoire d'abord</option><option>Explorateur</option><option>Chasseur à 100 %</option><option>Chaos total</option><option>Pilote</option></select></div>
-        <div><label class="f">Début de partie</label><input name="debut" type="date"></div>
-        <div style="grid-column:1/-1"><label class="f">Bio</label><textarea name="bio" rows="2" maxlength="160" placeholder="Objectif : 100 % avant Noël."></textarea></div>
-        <div style="grid-column:1/-1" class="row">
-          <label class="row small" style="gap:8px;cursor:pointer"><input type="checkbox" name="public" style="width:auto"> Apparaître dans le classement de la communauté</label>
-        </div>
-        <div style="grid-column:1/-1" class="row"><button class="btn pri" type="submit">Enregistrer</button><span class="small muted" id="profMsg"></span></div>
-      </form>
-    </div>
-  </div>
-  <h2 class="display">Badges</h2>
-  <div class="grid g4" id="badges"></div>
-  <h2 class="display">Sauvegarde</h2>
-  <div class="card">
-    <p class="small muted" style="margin-bottom:12px">Exporte toutes tes données (profil, missions, streamers, watchlist) ou importe une sauvegarde.</p>
-    <div class="row"><button class="btn sm" id="exportBtn">Copier ma sauvegarde</button><button class="btn sm" id="importBtn">Importer une sauvegarde</button><button class="btn sm danger" id="resetBtn">Tout réinitialiser</button></div>
-  </div>
-</section>
-
 <!-- MISSIONS -->
 <section class="view" id="v-missions">
   <h1 class="page display">Suivi des missions</h1>
@@ -400,7 +364,42 @@ tr.clk{cursor:pointer}tr.clk:hover td{background:rgba(255,255,255,.03)}
 
 <!-- COMPTE -->
 <section class="view" id="v-compte">
-  <div id="accBox"></div>
+  <div id="accHead"></div>
+  <div id="accAuth"></div>
+  <h2 class="display" id="profTitle">Profil joueur</h2>
+  <div class="grid g2" style="grid-template-columns:1fr 1.25fr;align-items:start">
+    <div class="card" id="idCard"></div>
+    <div class="card">
+      <h3 style="margin-bottom:14px">Modifier mon profil</h3>
+      <form id="profileForm" class="grid g2" style="gap:12px">
+        <div><label class="f">Pseudo</label><input name="pseudo" maxlength="20" placeholder="ViceKing_33" autocomplete="off"><div class="hint" id="pseudoHint"></div></div>
+        <div><label class="f">Plateforme</label><select name="plateforme"><option>PS5</option><option>PS5 Pro</option><option>Xbox Series X</option><option>Xbox Series S</option></select></div>
+        <div id="avWrap" style="grid-column:1/-1;display:none" class="grid g2">
+          <div><label class="f">Avatar</label><div class="avpick" id="avPick"></div></div>
+          <div><label class="f">Couleur</label><div class="cpick" id="cPick"></div></div>
+        </div>
+        <div><label class="f">Édition</label><select name="edition"><option>Standard</option><option>Ultimate</option></select></div>
+        <div><label class="f">Protagoniste préféré</label><select name="perso"><option>Lucia</option><option>Jason</option><option>Les deux</option></select></div>
+        <div><label class="f">Heures de jeu</label><input name="heures" type="number" min="0" step="0.5" placeholder="0"></div>
+        <div><label class="f">Argent en jeu ($)</label><input name="argent" type="number" min="0" step="1" placeholder="0"></div>
+        <div><label class="f">Style de jeu</label><select name="style"><option>Histoire d'abord</option><option>Explorateur</option><option>Chasseur à 100 %</option><option>Chaos total</option><option>Pilote</option></select></div>
+        <div><label class="f">Début de partie</label><input name="debut" type="date"></div>
+        <div style="grid-column:1/-1"><label class="f">Bio</label><textarea name="bio" rows="2" maxlength="160" placeholder="Objectif : 100 % avant Noël."></textarea></div>
+        <div style="grid-column:1/-1" class="row">
+          <label class="row small" style="gap:8px;cursor:pointer"><input type="checkbox" name="public" style="width:auto"> Apparaître dans le classement de la communauté</label>
+        </div>
+        <div style="grid-column:1/-1" class="row"><button class="btn pri" type="submit">Enregistrer</button><span class="hint" id="profMsg"></span></div>
+      </form>
+    </div>
+  </div>
+  <h2 class="display">Badges</h2>
+  <div class="grid g4" id="badges"></div>
+  <div id="accSecurity"></div>
+  <h2 class="display">Sauvegarde</h2>
+  <div class="card">
+    <p class="small muted" style="margin-bottom:12px">Exporte toutes tes données (profil, missions, streamers, watchlist) ou importe une sauvegarde.</p>
+    <div class="row"><button class="btn sm" id="exportBtn">Copier ma sauvegarde</button><button class="btn sm" id="importBtn">Importer une sauvegarde</button><button class="btn sm danger" id="resetBtn">Tout réinitialiser</button></div>
+  </div>
 </section>
 
 </main>
@@ -640,20 +639,23 @@ function renderVideos(){
 }
 function renderProfile(){
   const p=S.profile,st=stats(),f=$("#profileForm");
-  const pin=f.elements.pseudo;if(backend==="supabase"&&uid){pin.disabled=true;pin.title="Le pseudo se modifie dans l'onglet Compte";$("#pseudoHint").innerHTML='Pseudo de ton compte · <a href="#compte" data-go="compte">modifier</a>'}else{pin.disabled=false;pin.title="";$("#pseudoHint").textContent=backend==="supabase"?"Il sera proposé comme pseudo à la création de ton compte.":""}
+  const linkedNow=backend==="supabase"&&uid&&ACC;
+  $("#avWrap").style.display=linkedNow?"":"none";
+  if(linkedNow){if(!PICK||PICK.id!==uid)PICK={id:uid,avatar:ACC.avatar,color:ACC.color};
+    $("#avPick").innerHTML=AVATARS.map(x=>`<button type="button" data-av="${x}" class="${x===PICK.avatar?"on":""}">${x}</button>`).join("");
+    $("#cPick").innerHTML=COLORS.map(c=>`<button type="button" data-col="${c}" class="${c===PICK.color?"on":""}" style="background:${c}"></button>`).join("");
+    if(!f.elements.pseudo.dataset.bound){f.elements.pseudo.dataset.bound="1";f.elements.pseudo.dataset.bindmode="acct";bindUname(f.elements.pseudo,$("#pseudoHint"),()=>ACC&&ACC.username)}
+    if(document.activeElement!==f.elements.pseudo&&(p.pseudo||"").toLowerCase()===ACC.username.toLowerCase()){const ph=$("#pseudoHint");ph.className="hint";ph.textContent="Pseudo public de ton compte (unique)."}}
+  else{const ph=$("#pseudoHint");if(document.activeElement!==f.elements.pseudo){ph.className="hint";ph.textContent=backend==="supabase"?"Il sera proposé comme pseudo à la création de ton compte.":""}}
   if(document.activeElement?.form!==f){
     for(const k of Object.keys(p)){const el=f.elements[k];if(!el)continue;if(el.type==="checkbox")el.checked=!!p[k];else el.value=p[k]??""}
   }
-  const ini=(p.pseudo||"?").slice(0,2).toUpperCase(),linked=backend==="supabase"&&uid&&ACC;
-  const L=$("#profLink");
-  if(backend==="supabase"&&!uid)L.innerHTML=`<div class="notice row" style="justify-content:space-between;gap:12px"><span>⚠️ Ton profil n'est <b>pas lié à un compte</b> : il est seulement enregistré dans ce navigateur. Crée ton compte ou connecte-toi pour le sauvegarder et le retrouver partout.</span><span class="row" style="gap:8px"><button class="btn sm pri" data-acct-go="signup">Créer mon compte</button><button class="btn sm" data-acct-go="login">Se connecter</button></span></div>`;
-  else if(linked)L.innerHTML=`<div class="notice t row" style="justify-content:space-between;gap:12px"><span class="row" style="gap:10px;flex-wrap:nowrap">${avatarHtml(ACC.avatar,ACC.color,30)}<span>Profil lié au compte <b>${esc(ACC.username)}</b> · ${esc(sbEmail)} · <span style="color:var(--green)">synchronisé</span></span></span><button class="btn sm" data-go="compte">Gérer mon compte</button></div>`;
-  else L.innerHTML="";
+  const ini=(p.pseudo||"?").slice(0,2).toUpperCase(),linked=linkedNow;
   $("#idCard").innerHTML=`
    <div style="border-radius:14px;padding:20px;background:linear-gradient(160deg,#2b0f4a,#7a1a5e 55%,#ff5a6e);position:relative;overflow:hidden">
     <div class="small" style="letter-spacing:.2em;font-weight:800;color:#ffd9e8">ÉTAT DE LEONIDA · PERMIS DE JOUEUR</div>
     <div class="row" style="margin-top:14px;gap:16px;align-items:center">
-      ${linked?`<div class="av" style="width:74px;height:74px;font-size:38px;background:${esc(ACC.color)};border-radius:16px">${esc(ACC.avatar)}</div>`:`<div class="av display" style="width:74px;height:74px;font-size:34px;background:var(--grad);border-radius:16px">${esc(ini)}</div>`}
+      ${linked?`<div class="av" style="width:74px;height:74px;font-size:38px;background:${esc(PICK.color)};border-radius:16px">${esc(PICK.avatar)}</div>`:`<div class="av display" style="width:74px;height:74px;font-size:34px;background:var(--grad);border-radius:16px">${esc(ini)}</div>`}
       <div><div class="display" style="font-size:40px;line-height:1">${esc(p.pseudo||"Joueur anonyme")}</div><div class="small" style="color:#ffe2ef">${esc(p.plateforme)} · Édition ${esc(p.edition)} · Team ${esc(p.perso)}</div></div>
     </div>
     ${p.bio?`<p class="small" style="margin-top:12px;color:#fff">« ${esc(p.bio)} »</p>`:""}
@@ -708,11 +710,11 @@ function renderGuide(){
   $("#faq").innerHTML=FAQ.map(([q,a])=>`<div class="card"><h3 style="margin-bottom:6px">${esc(q)}</h3><p class="small muted">${esc(a)}</p></div>`).join("");
   const seen=new Set();$("#sources").innerHTML=Object.values(SRC).filter(s=>!seen.has(s.u)&&seen.add(s.u)).map(s=>`<li><a href="${s.u}" target="_blank" rel="noopener">${esc(s.n)}</a></li>`).join("");
 }
-function renderAll(){renderAuth();renderNews();renderStreams();renderVideos();renderProfile();renderMissions();renderLB()}
+function renderAll(){renderAuth();renderAccount();renderNews();renderStreams();renderVideos();renderProfile();renderMissions();renderLB()}
 
 /* ---------------- ROUTING ---------------- */
-const VIEWS=["accueil","actus","streams","videos","profil","missions","classement","guide","compte"];
-function go(v){const authHash=/access_token|error_description/.test(location.hash);if(!VIEWS.includes(v))v="accueil";$$("section.view").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));$$(".tab").forEach(t=>t.classList.toggle("on",t.dataset.go===v));if(!authHash&&location.hash!=="#"+v){try{history.replaceState(null,"","#"+v)}catch(e){location.hash=v}}window.scrollTo({top:0,behavior:"smooth"})}
+const VIEWS=["accueil","actus","streams","videos","missions","classement","guide","compte"];
+function go(v){if(v==="profil")v="compte";const authHash=/access_token|error_description/.test(location.hash);if(!VIEWS.includes(v))v="accueil";$$("section.view").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));$$(".tab").forEach(t=>t.classList.toggle("on",t.dataset.go===v));if(!authHash&&location.hash!=="#"+v){try{history.replaceState(null,"","#"+v)}catch(e){location.hash=v}}window.scrollTo({top:0,behavior:"smooth"})}
 window.addEventListener("hashchange",()=>go(location.hash.slice(1)));
 
 /* ---------------- MODALS ---------------- */
@@ -742,10 +744,12 @@ function missionModal(m){
 
 /* ---------------- EVENTS ---------------- */
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-acct-go],[data-acct],[data-oauth],[data-pp],[data-tw],[data-play],[data-go],[data-nc],[data-mc],[data-cyc],[data-edm],[data-delm],[data-reg],[data-lch],[data-delstr],[data-seen],[data-delvid],[data-add-m]");
+  const t=e.target.closest("[data-av],[data-col],[data-acct-go],[data-acct],[data-oauth],[data-pp],[data-tw],[data-play],[data-go],[data-nc],[data-mc],[data-cyc],[data-edm],[data-delm],[data-reg],[data-lch],[data-delstr],[data-seen],[data-delvid],[data-add-m]");
   if(!t)return;const d=t.dataset;
-  if(d.acctGo){accTab=d.acctGo;renderAccount();go("compte")}
-  else if(d.acct){e.preventDefault();accTab=d.acct;renderAccount()}
+  if(d.av&&PICK){PICK.avatar=d.av;renderProfile()}
+  else if(d.col&&PICK){PICK.color=d.col;renderProfile()}
+  else if(d.acctGo){accTab=d.acctGo;renderAccount(true);go("compte")}
+  else if(d.acct){e.preventDefault();accTab=d.acct;renderAccount(true)}
   else if(d.oauth){sb.auth.signInWithOAuth({provider:d.oauth,options:{redirectTo:BASE}}).then(({error})=>{if(error)toast(frErr(error))})}
   else if(d.pp){publicProfile(d.pp)}
   else if(d.tw){playTwitch(d.tw)}
@@ -773,12 +777,22 @@ $("#addVideoBtn").onclick=()=>modal(`<h2 class="display" style="margin:0 0 14px"
   <div><label class="f">Lien</label><input name="u" required type="url" placeholder="https://www.youtube.com/watch?v=…"></div>
   <div><label class="f">Titre (facultatif)</label><input name="t" maxlength="90" placeholder="Analyse complète du trailer 2"></div>
   <div class="row" style="justify-content:flex-end"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn pri">Ajouter</button></div></form>`,fd=>{const u=fd.get("u").trim();if(!/^https?:\/\//i.test(u))return false;S.videos.unshift({id:uidGen(),u,t:fd.get("t").trim(),seen:false});save();toast("Ajoutée à ta watchlist")});
-$("#profileForm").addEventListener("submit",e=>{e.preventDefault();const f=e.target,p=S.profile;
-  for(const k of Object.keys(p)){const el=f.elements[k];if(!el||el.disabled)continue;p[k]=el.type==="checkbox"?el.checked:el.value.trim()}
-  if(backend==="supabase"&&!uid&&p.public){toast("Crée un compte pour apparaître au classement");p.public=false}
-  if(p.public&&!p.pseudo){toast("Choisis un pseudo pour apparaître au classement");p.public=false}
-  if(backend==="supabase"&&uid&&ACC){sb.from("profiles").update({bio:String(p.bio||"").slice(0,160),plateforme:String(p.plateforme||"").slice(0,30),perso:String(p.perso||"").slice(0,30)}).eq("id",uid).select().single().then(({data})=>{if(data){ACC=data;renderProfile()}})}
-  document.activeElement?.blur();save();toast(backend==="supabase"&&uid?"Profil enregistré sur ton compte":"Profil enregistré");$("#profMsg").textContent="Enregistré ✓";setTimeout(()=>$("#profMsg").textContent="",2000)});
+$("#profileForm").addEventListener("submit",async e=>{e.preventDefault();const f=e.target,p=S.profile,m=$("#profMsg");m.className="hint";m.textContent="";
+  const vals={};for(const k of Object.keys(p)){const el=f.elements[k];if(!el)continue;vals[k]=el.type==="checkbox"?el.checked:el.value.trim()}
+  if(backend==="supabase"&&!uid&&vals.public){toast("Crée un compte pour apparaître au classement");vals.public=false}
+  if(vals.public&&!vals.pseudo){toast("Choisis un pseudo pour apparaître au classement");vals.public=false}
+  if(backend==="supabase"&&uid&&ACC){
+    const un=vals.pseudo;
+    try{
+      if(un.toLowerCase()!==ACC.username.toLowerCase()){if(!/^[A-Za-z0-9_]{3,20}$/.test(un))throw new Error("Pseudo invalide : 3 à 20 caractères (lettres, chiffres, _).");const {data}=await sb.rpc("username_available",{name:un});if(!data)throw new Error("Ce pseudo est déjà pris.")}
+      m.textContent="Enregistrement…";
+      const {data,error}=await sb.from("profiles").update({username:un,avatar:PICK.avatar,color:PICK.color,bio:String(vals.bio||"").slice(0,160),plateforme:String(vals.plateforme||"").slice(0,30),perso:String(vals.perso||"").slice(0,30)}).eq("id",uid).select().single();
+      if(error)throw error;ACC=data;PICK={id:uid,avatar:data.avatar,color:data.color};
+    }catch(err){m.className="hint bad";m.textContent=frErr(err);return}
+  }
+  Object.assign(p,vals);document.activeElement?.blur();save();renderAccount();renderAuth();
+  m.className="hint ok";m.textContent=backend==="supabase"&&uid?"✓ Enregistré sur ton compte":"✓ Enregistré";setTimeout(()=>{if(m.textContent.startsWith("✓"))m.textContent=""},2500);
+});
 $("#exportBtn").onclick=async()=>{const txt=JSON.stringify(S);try{await navigator.clipboard.writeText(txt);toast("Sauvegarde copiée dans le presse-papiers")}catch(e){modal(`<h3>Ta sauvegarde</h3><p class="small muted" style="margin:6px 0 10px">Sélectionne et copie ce texte.</p><textarea rows="8" readonly onclick="this.select()">${esc(txt)}</textarea><div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" data-close>Fermer</button></div>`)}};
 $("#importBtn").onclick=()=>modal(`<h2 class="display" style="margin:0 0 10px">Importer une sauvegarde</h2><form class="grid" style="gap:12px"><textarea name="j" rows="8" required placeholder="Colle ici ta sauvegarde…"></textarea><div class="row" style="justify-content:flex-end"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn pri">Importer</button></div></form>`,fd=>{try{S=norm(JSON.parse(fd.get("j")));save();toast("Sauvegarde importée")}catch(e){toast("Sauvegarde invalide");return false}});
 $("#resetBtn").onclick=()=>{modal(`<h3>Tout réinitialiser ?</h3><p class="small muted" style="margin:8px 0 16px">Profil, missions, streamers et watchlist seront effacés.</p><div class="row" style="justify-content:flex-end"><button class="btn ghost" data-close>Annuler</button><button class="btn pri" id="cfr">Réinitialiser</button></div>`);$("#cfr").onclick=()=>{S=DEFAULT();save();$("#modal").classList.remove("on");toast("Données réinitialisées")}};
@@ -802,7 +816,7 @@ async function fetchNewsJson(){try{const r=await fetch("news.json",{cache:"no-st
 /* ================= COMPTES (Supabase) ================= */
 const BASE=location.origin+location.pathname;
 const FROM_AUTH_LINK=/access_token=/.test(location.hash);
-let ACC=null, sbUser=null, accTab="login", ppCache={};
+let ACC=null, sbUser=null, accTab="login", ppCache={}, PICK=null;
 const AVATARS=["🌴","🌆","🏎️","🚤","🐊","🦩","💰","🔫","🎰","🌅","🕶️","👑","🔥","💎","🎮","🛩️"];
 const COLORS=["#ff3d8b","#ff8a3d","#ffd23d","#3ddc84","#2de2e6","#8b5cf6","#f43f5e","#94a3b8"];
 function frErr(e){const m=String(e&&e.message||e||"");
@@ -821,7 +835,9 @@ function pwScore(p){let s=0;if(p.length>=8)s++;if(p.length>=12)s++;if(/[a-z]/.te
 const PWL=[["Trop court","#ff2e4d"],["Faible","#ff6b3d"],["Moyen","#ffd23d"],["Bon","#9be15d"],["Excellent","#3ddc84"]];
 function bindPw(inp,bar,lab){inp.addEventListener("input",()=>{const v=inp.value,s=v.length<8?0:pwScore(v);bar.style.width=(v?(s+1)*20:0)+"%";bar.style.background=PWL[s][1];lab.textContent=v?PWL[s][0]:"";lab.className="hint "+(s>=2?"ok":v?"bad":"")})}
 let unameTimer=null;
-function bindUname(inp,hint,current){const run=async()=>{const v=inp.value.trim();inp.dataset.ok="";
+function bindUname(inp,hint,currentArg){const run=async()=>{const v=inp.value.trim();inp.dataset.ok="";
+  if(inp.dataset.bindmode==="acct"&&!uid){hint.className="hint";hint.textContent=backend==="supabase"?"Il sera proposé comme pseudo à la création de ton compte.":"";return}
+  const current=typeof currentArg==="function"?currentArg():currentArg;
   if(!v){hint.textContent="";hint.className="hint";return}
   if(current&&v.toLowerCase()===current.toLowerCase()){hint.textContent="C'est ton pseudo actuel.";hint.className="hint ok";inp.dataset.ok="1";return}
   if(!/^[A-Za-z0-9_]{3,20}$/.test(v)){hint.textContent="3 à 20 caractères : lettres, chiffres ou _";hint.className="hint bad";return}
@@ -832,18 +848,23 @@ function bindUname(inp,hint,current){const run=async()=>{const v=inp.value.trim(
   inp.addEventListener("input",()=>{clearTimeout(unameTimer);unameTimer=setTimeout(run,400)});if(inp.value)run()}
 function avatarHtml(a,c,size){size=size||44;return `<div class="av" style="width:${size}px;height:${size}px;font-size:${Math.round(size*.5)}px;background:${esc(c||"#ff3d8b")}">${esc(a||"🌴")}</div>`}
 function renderAuth(){const b=$("#authBtn"),t=$("#tabCompte");
-  if(backend!=="supabase"){b.style.display="none";t.style.display="none";return}
-  b.style.display="";t.style.display="";
+  t.textContent="Mon compte";
+  if(backend!=="supabase"){b.style.display="none";t.style.display="";return}
+  b.style.display="";t.style.display="none";
   b.innerHTML=uid?`<span style="font-size:16px">${esc(ACC?.avatar||"👤")}</span> ${esc(ACC?.username||"Mon compte")}`:"Connexion / Inscription";
   b.classList.toggle("pri",!uid)}
 function authModal(){go("compte")}
 
-function renderAccount(){const B=$("#accBox");if(!B)return;
-  if(backend==="claude"){B.innerHTML=`<h1 class="page display">Mon compte</h1><div class="card"><p>Sur cette version, ton compte est ton compte Claude : profil et missions sont déjà synchronisés automatiquement.</p></div>`;return}
-  if(backend!=="supabase"){B.innerHTML=`<h1 class="page display">Mon compte</h1><div class="empty">Les comptes ne sont pas disponibles pour le moment.</div>`;return}
-  if(!uid){renderAuthForms(B);return}
-  renderDashboard(B)}
-
+function renderAccount(force){const H=$("#accHead"),A=$("#accAuth"),Sec=$("#accSecurity");if(!H)return;
+  const linked=backend==="supabase"&&uid&&ACC;
+  if(linked){const a=ACC,since=a.created_at?new Date(a.created_at).toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"}):"",st=stats();
+    H.innerHTML=`<div class="row" style="gap:18px;margin-bottom:6px;align-items:center">${avatarHtml(a.avatar,a.color,84)}<div><h1 class="page display" style="margin:0">${esc(a.username)}</h1><div class="muted small">Membre depuis le ${esc(since)} · ${esc(sbEmail)} · ${st.pct} % de progression · ${badges().filter(b=>b.on).length} badges · <span style="color:var(--green)">synchronisé</span></div></div></div>`}
+  else{const sub=backend==="supabase"?"Crée ton compte (ou connecte-toi) pour sauvegarder ton profil et ta progression en ligne et les retrouver sur tous tes appareils.":backend==="claude"?"Ton profil est synchronisé automatiquement avec ton compte Claude.":"Ton profil est enregistré dans ce navigateur.";
+    H.innerHTML=`<h1 class="page display">Mon compte</h1><p class="sub">${sub}</p>`}
+  if(backend==="supabase"&&!uid){const key="out:"+accTab;if(force||A.dataset.key!==key){A.dataset.key=key;renderAuthForms(A)}}else{A.innerHTML="";A.dataset.key=""}
+  $("#profTitle").textContent=backend==="supabase"&&!uid?"Ton profil sur cet appareil":"Profil joueur";
+  if(linked){if(force||Sec.dataset.key!==uid){Sec.dataset.key=uid;renderSecurity(Sec)}}else{Sec.innerHTML="";Sec.dataset.key=""}
+}
 function renderAuthForms(B){
   const oauth=(CFG.oauth||[]).map(p=>{const n={discord:"Discord",twitch:"Twitch",google:"Google",github:"GitHub"}[p]||p;const c={discord:"#5865f2",twitch:"#9146ff",google:"#fff",github:"#24292f"}[p]||"#444";return `<button class="btn" data-oauth="${esc(p)}" style="justify-content:center;background:${c};color:${p==="google"?"#111":"#fff"};border:none">Continuer avec ${esc(n)}</button>`}).join("");
   const tabs=`<div class="acc-tabs"><button data-acct="login" class="${accTab==="login"?"on":""}">Connexion</button><button data-acct="signup" class="${accTab==="signup"?"on":""}">Créer un compte</button></div>`;
@@ -868,8 +889,7 @@ function renderAuthForms(B){
   else form=`<form id="fMagic" class="grid" style="gap:12px"><p class="small muted">Reçois un lien de connexion par e-mail, sans mot de passe.</p>
     <div><label class="f">E-mail</label><input name="email" type="email" required autocomplete="email"></div>
     <button class="btn pri" style="justify-content:center">Recevoir le lien</button><a class="small" href="#compte" data-acct="login">← Retour à la connexion</a><p class="hint" id="fMsg"></p></form>`;
-  B.innerHTML=`<h1 class="page display">Ton compte VICE HUB</h1><p class="sub">Un compte, ta progression partout : profil, missions, streamers et watchlist synchronisés sur tous tes appareils, et ta place dans le classement.</p>
-  <div class="grid g2" style="grid-template-columns:1fr 1fr;align-items:start">
+  B.innerHTML=`<div class="grid g2" style="grid-template-columns:1fr 1fr;align-items:start">
     <div class="card" style="background:linear-gradient(160deg,#2b0f4a,#7a1a5e 60%,#ff5a6e);border:none">
       <div class="display" style="font-size:40px;line-height:1">BIENVENUE À<br>LEONIDA</div>
       <ul style="list-style:none;margin-top:18px;display:grid;gap:12px">
@@ -905,44 +925,23 @@ function renderAuthForms(B){
       else if(f.id==="fMagic"){const {error}=await sb.auth.signInWithOtp({email:el.email.value.trim(),options:{emailRedirectTo:BASE,shouldCreateUser:false}});if(error)throw error;msg.className="hint ok";msg.textContent="📧 Lien envoyé ! Ouvre-le pour te connecter."}
     }catch(err){msg.className="hint bad";msg.textContent=frErr(err)}finally{lock(false)}})}
 
-function renderDashboard(B){
-  const a=ACC||{},since=a.created_at?new Date(a.created_at).toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"}):"",prov=(sbUser?.app_metadata?.provider)||"email",st=stats();
-  B.innerHTML=`<div class="row" style="gap:18px;margin-bottom:22px;align-items:center">${avatarHtml(a.avatar,a.color,84)}<div><h1 class="page display" style="margin:0">${esc(a.username||"Joueur")}</h1><div class="muted small">Membre depuis le ${esc(since)} · ${st.pct} % de progression · ${badges().filter(b=>b.on).length} badges</div></div><div style="flex:1"></div><button class="btn" data-go="profil">Profil de jeu →</button></div>
-  <div class="grid g2" style="align-items:start">
-    <div class="card"><h3>Profil public</h3><p class="small muted" style="margin:4px 0 14px">Visible par les autres joueurs dans le classement.</p>
-      <form id="fPub" class="grid" style="gap:14px">
-        <div><label class="f">Pseudo</label><input name="username" maxlength="20" value="${esc(a.username||"")}"><div class="hint" id="unHint2"></div></div>
-        <div><label class="f">Avatar</label><div class="avpick" id="avPick">${AVATARS.map(x=>`<button type="button" data-av="${x}" class="${x===a.avatar?"on":""}">${x}</button>`).join("")}</div></div>
-        <div><label class="f">Couleur</label><div class="cpick" id="cPick">${COLORS.map(c=>`<button type="button" data-col="${c}" class="${c===a.color?"on":""}" style="background:${c}"></button>`).join("")}</div></div>
-        <div><label class="f">Bio</label><textarea name="bio" rows="2" maxlength="160">${esc(a.bio||"")}</textarea></div>
-        <div class="row"><button class="btn pri">Enregistrer</button><span class="hint" id="pubMsg"></span></div>
-      </form></div>
-    <div class="grid" style="gap:16px">
+function renderSecurity(B){
+  const a=ACC||{},prov=(sbUser?.app_metadata?.provider)||"email";
+  B.innerHTML=`<h2 class="display">Compte &amp; sécurité</h2><div class="grid g2" style="align-items:start">
       <div class="card"><h3>Adresse e-mail</h3><p class="small muted" style="margin:4px 0 12px">Actuelle : <b style="color:var(--txt)">${esc(sbEmail)}</b>${prov!=="email"?` · connecté via ${esc(prov)}`:""}</p>
         <form id="fEmail" class="row"><input name="email" type="email" required placeholder="nouvelle@adresse.fr" style="flex:1;min-width:180px"><button class="btn sm">Changer</button></form><p class="hint" id="emMsg"></p></div>
       <div class="card"><h3>Mot de passe</h3>
         <form id="fPw" class="grid" style="gap:10px;margin-top:10px"><div><input name="pw" type="password" required autocomplete="new-password" placeholder="Nouveau mot de passe"><div class="pwbar"><i id="pwBar2"></i></div><div class="hint" id="pwLab2"></div></div><input name="pw2" type="password" required autocomplete="new-password" placeholder="Confirmer"><div><button class="btn sm">Mettre à jour</button></div></form><p class="hint" id="pwMsg"></p></div>
       <div class="card"><h3>Session</h3><div class="row" style="margin-top:10px"><button class="btn sm" id="bOut">Se déconnecter</button><button class="btn sm" id="bOutAll">Déconnecter tous mes appareils</button></div></div>
       <div class="card" style="border-color:rgba(255,46,77,.4)"><h3 style="color:#ff6b81">Zone dangereuse</h3><p class="small muted" style="margin:4px 0 12px">Supprime définitivement ton compte, ta sauvegarde en ligne et ta place au classement.</p><button class="btn sm danger" id="bDel">Supprimer mon compte</button></div>
-    </div>
-  </div>`;
-  let pick={avatar:a.avatar||"🌴",color:a.color||"#ff3d8b"};
-  $("#avPick").onclick=e=>{const b=e.target.closest("[data-av]");if(!b)return;pick.avatar=b.dataset.av;$$("#avPick button").forEach(x=>x.classList.toggle("on",x===b))};
-  $("#cPick").onclick=e=>{const b=e.target.closest("[data-col]");if(!b)return;pick.color=b.dataset.col;$$("#cPick button").forEach(x=>x.classList.toggle("on",x===b))};
-  const fp=$("#fPub");bindUname(fp.elements.username,$("#unHint2"),a.username);
-  fp.onsubmit=async e=>{e.preventDefault();const m=$("#pubMsg"),un=fp.elements.username.value.trim();m.className="hint";m.textContent="Enregistrement…";
-    try{if(un.toLowerCase()!==(a.username||"").toLowerCase()){if(!/^[A-Za-z0-9_]{3,20}$/.test(un))throw new Error("Pseudo invalide : 3 à 20 caractères (lettres, chiffres, _).");const {data}=await sb.rpc("username_available",{name:un});if(!data)throw new Error("Ce pseudo est déjà pris.")}
-      const upd={username:un,avatar:pick.avatar,color:pick.color,bio:fp.elements.bio.value.trim().slice(0,160)};
-      const {data,error}=await sb.from("profiles").update(upd).eq("id",uid).select().single();if(error)throw error;
-      ACC=data;S.profile.pseudo=ACC.username;S.profile.bio=ACC.bio;save();renderProfile();m.className="hint ok";m.textContent="✓ Profil mis à jour";renderAuth();setTimeout(()=>renderAccount(),900)}
-    catch(err){m.className="hint bad";m.textContent=frErr(err)}};
+    </div>`;
   $("#fEmail").onsubmit=async e=>{e.preventDefault();const m=$("#emMsg");try{const {error}=await sb.auth.updateUser({email:e.target.elements.email.value.trim()},{emailRedirectTo:BASE});if(error)throw error;m.className="hint ok";m.textContent="📧 Confirme le changement via les liens envoyés à tes adresses.";e.target.reset()}catch(err){m.className="hint bad";m.textContent=frErr(err)}};
   const fw=$("#fPw");bindPw(fw.elements.pw,$("#pwBar2"),$("#pwLab2"));
   fw.onsubmit=async e=>{e.preventDefault();const m=$("#pwMsg"),el=fw.elements;try{if(el.pw.value.length<8||pwScore(el.pw.value)<2)throw new Error("Mot de passe trop faible (8 caractères min., mélange lettres/chiffres/symboles).");if(el.pw.value!==el.pw2.value)throw new Error("Les deux mots de passe ne correspondent pas.");const {error}=await sb.auth.updateUser({password:el.pw.value});if(error)throw error;m.className="hint ok";m.textContent="✓ Mot de passe mis à jour";fw.reset();$("#pwBar2").style.width=0;$("#pwLab2").textContent=""}catch(err){m.className="hint bad";m.textContent=frErr(err)}};
   $("#bOut").onclick=()=>doSignOut("local");$("#bOutAll").onclick=()=>doSignOut("global");
   $("#bDel").onclick=()=>{modal(`<h2 class="display" style="margin:0 0 8px;color:#ff6b81">Supprimer mon compte</h2><p class="small muted">Cette action est <b>définitive</b> : ton compte, ta sauvegarde en ligne et ta place au classement seront effacés. Ta progression reste sur cet appareil.</p><form class="grid" style="gap:12px;margin-top:14px"><div><label class="f">Tape ton pseudo « ${esc(a.username)} » pour confirmer</label><input name="c" required autocomplete="off"></div><div class="row" style="justify-content:flex-end"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn danger" style="border-color:#ff2e4d;color:#ff6b81">Supprimer définitivement</button></div><p class="hint bad" id="delMsg"></p></form>`,fd=>{
     if(String(fd.get("c")).trim()!==a.username){$("#delMsg").textContent="Le pseudo ne correspond pas.";return false}
-    const oldId=uid;sb.rpc("delete_my_account").then(async({error})=>{if(error){$("#delMsg").textContent=frErr(error);return}$("#modal").classList.remove("on");try{await sb.auth.signOut({scope:"local"})}catch(e){}uid=null;ACC=null;sbUser=null;LB=LB.filter(r=>r.id!==oldId);renderAuth();renderAccount();fetchLB();toast("Compte supprimé")});return false})}}
+    const oldId=uid;sb.rpc("delete_my_account").then(async({error})=>{if(error){$("#delMsg").textContent=frErr(error);return}$("#modal").classList.remove("on");try{await sb.auth.signOut({scope:"local"})}catch(e){}uid=null;ACC=null;sbUser=null;S.profile.public=false;lsSet();LB=LB.filter(r=>r.id!==oldId);renderAll();fetchLB();setSave("warn","Non connecté · sauvegarde locale");toast("Compte supprimé")});return false})}}
 async function doSignOut(scope){try{await sb.auth.signOut({scope})}catch(e){}uid=null;ACC=null;sbUser=null;sbEmail="";renderAuth();renderAccount();renderLB();renderProfile();setSave("warn","Non connecté · sauvegarde locale");toast(scope==="global"?"Déconnecté de tous les appareils":"Déconnecté")}
 function recoveryModal(){modal(`<h2 class="display" style="margin:0 0 8px">Nouveau mot de passe</h2><p class="small muted">Choisis un nouveau mot de passe pour ton compte.</p><form class="grid" style="gap:12px;margin-top:12px"><div><input name="pw" type="password" required autocomplete="new-password" placeholder="Nouveau mot de passe" id="rpw"><div class="pwbar"><i id="rBar"></i></div><div class="hint" id="rLab"></div></div><input name="pw2" type="password" required autocomplete="new-password" placeholder="Confirmer"><button class="btn pri">Enregistrer</button><p class="hint bad" id="rMsg"></p></form>`,fd=>{
   const pw=String(fd.get("pw")),pw2=String(fd.get("pw2")),m=$("#rMsg");
