@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VICE HUB — Le QG GTA 6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0614; --bg2:#120b22; --card:#170e2b; --card2:#1e1336; --line:#2e2150;
+  --txt:#f3eefc; --mut:#a99cc6; --pink:#ff3d8b; --orange:#ff8a3d; --teal:#2de2e6; --purple:#8b5cf6; --green:#3ddc84; --yellow:#ffd23d;
+  --grad:linear-gradient(135deg,#ff3d8b 0%,#ff8a3d 55%,#ffd23d 100%);
+  --grad2:linear-gradient(135deg,#2de2e6 0%,#8b5cf6 100%);
+  --r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5;min-height:100vh;
+  background-image:radial-gradient(1200px 600px at 85% -10%,rgba(255,61,139,.18),transparent 60%),radial-gradient(900px 500px at -10% 10%,rgba(45,226,230,.12),transparent 60%);background-attachment:fixed}
+a{color:var(--teal);text-decoration:none}
+a:hover{text-decoration:underline}
+button,input,select,textarea{font:inherit;color:inherit}
+.display{font-family:"Bebas Neue",Impact,sans-serif;letter-spacing:.04em;font-weight:400}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px}
+
+/* NAV */
+header{position:sticky;top:0;z-index:50;background:rgba(10,6,20,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:18px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-size:28px;white-space:nowrap;cursor:pointer}
+.logo .mark{width:34px;height:34px;border-radius:9px;background:var(--grad);display:grid;place-items:center;color:#1a0b1f;font-size:22px}
+.logo span.g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 14px;border-radius:999px;color:var(--mut);font-weight:600;font-size:14px;white-space:nowrap;cursor:pointer;border:1px solid transparent;background:none}
+.tab:hover{color:var(--txt);background:var(--card)}
+.tab.on{color:#160a1c;background:var(--grad)}
+.savepill{font-size:12px;color:var(--mut);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mut);display:inline-block}
+.dot.ok{background:var(--green);box-shadow:0 0 8px var(--green)}
+.dot.warn{background:var(--yellow)}
+.dot.live{background:#ff2e4d;box-shadow:0 0 10px #ff2e4d;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.35}}
+
+main{padding:28px 0 60px}
+section.view{display:none;animation:fade .35s ease}
+section.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+h1.page{font-size:56px;line-height:1;margin-bottom:6px}
+.sub{color:var(--mut);margin-bottom:24px;max-width:760px}
+h2{font-size:30px;margin:34px 0 14px}
+h3{font-size:17px;font-weight:700}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:980px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr}h1.page{font-size:42px}}
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.card.hov{transition:transform .18s,border-color .18s}
+.card.hov:hover{transform:translateY(-3px);border-color:var(--pink)}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:rgba(255,61,139,.14);color:var(--pink)}
+.tag.t{background:rgba(45,226,230,.13);color:var(--teal)}
+.tag.o{background:rgba(255,138,61,.15);color:var(--orange)}
+.tag.p{background:rgba(139,92,246,.18);color:#b9a1ff}
+.tag.g{background:rgba(61,220,132,.14);color:var(--green)}
+.muted{color:var(--mut)}.small{font-size:13px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:12px;border:1px solid var(--line);background:var(--card2);font-weight:600;cursor:pointer;font-size:14px}
+.btn:hover{border-color:var(--teal);text-decoration:none}
+.btn.pri{background:var(--grad);color:#1a0b1f;border:none}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.sm{padding:6px 11px;font-size:13px;border-radius:9px}
+.btn.ghost{background:none}
+.btn.danger:hover{border-color:#ff2e4d;color:#ff6b81}
+input,select,textarea{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--teal)}
+label.f{display:block;font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.bar{height:10px;background:var(--bg2);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:var(--grad);border-radius:999px;transition:width .5s}
+
+/* HERO */
+.hero{position:relative;border-radius:24px;overflow:hidden;padding:44px 40px;border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(10,6,20,0) 30%,rgba(10,6,20,.9) 100%),linear-gradient(160deg,#2b0f4a 0%,#7a1a5e 38%,#ff5a6e 64%,#ffb04a 82%,#ffd98a 100%)}
+.hero svg.sky{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hero .in{position:relative;z-index:2}
+.hero h1{font-size:92px;line-height:.9;text-shadow:0 4px 30px rgba(0,0,0,.35)}
+@media(max-width:640px){.hero{padding:28px 20px}.hero h1{font-size:58px}}
+.cd{display:flex;gap:12px;margin:22px 0 10px;flex-wrap:wrap}
+.cd div{background:rgba(10,6,20,.55);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:10px 16px;min-width:88px;text-align:center;backdrop-filter:blur(6px)}
+.cd b{display:block;font-family:"Bebas Neue";font-size:48px;line-height:1;font-weight:400}
+.cd small{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffe2ef}
+.stat{font-family:"Bebas Neue";font-size:44px;line-height:1}
+.stat.g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat.t{background:var(--grad2);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* NEWS */
+.news{display:grid;grid-template-columns:110px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}
+.news:last-child{border-bottom:none}
+.news .d{font-family:"Bebas Neue";font-size:26px;line-height:1;color:var(--orange)}
+.news .d small{display:block;font-family:Inter;font-size:12px;color:var(--mut);letter-spacing:0}
+.news h3{margin-bottom:4px}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.chip{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:13px;font-weight:600;color:var(--mut)}
+.chip.on{background:var(--txt);color:var(--bg);border-color:var(--txt)}
+
+/* VIDEOS */
+.vthumb{aspect-ratio:16/9;border-radius:12px;margin-bottom:12px;position:relative;overflow:hidden;display:grid;place-items:center}
+.vthumb .play{width:58px;height:58px;border-radius:50%;background:rgba(10,6,20,.6);border:2px solid rgba(255,255,255,.8);display:grid;place-items:center;transition:transform .2s}
+.card.hov:hover .play{transform:scale(1.1)}
+.vthumb .len{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.7);font-size:12px;font-weight:700;padding:2px 7px;border-radius:6px}
+.vthumb .big{position:absolute;left:14px;bottom:8px;font-family:"Bebas Neue";font-size:34px;color:rgba(255,255,255,.92);text-shadow:0 2px 12px rgba(0,0,0,.4)}
+
+/* MISSIONS */
+.mrow{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);margin-bottom:8px}
+.mrow.done{opacity:.6}
+.mrow.done .mt{text-decoration:line-through}
+.chk{width:28px;height:28px;border-radius:8px;border:2px solid var(--line);background:var(--bg2);cursor:pointer;display:grid;place-items:center;font-weight:900;color:#1a0b1f}
+.chk.s1{border-color:var(--orange);background:rgba(255,138,61,.2)}
+.chk.s2{border-color:var(--green);background:var(--green)}
+.mt{font-weight:600}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;align-items:center}
+.cl li{list-style:none;display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);cursor:pointer}
+.cl li:last-child{border-bottom:none}
+.cl li .chk{width:22px;height:22px;border-radius:6px;font-size:13px}
+.cl li.done span.l{color:var(--green)}
+
+/* BADGES */
+.badge{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg2)}
+.badge .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:22px;background:var(--card2);filter:grayscale(1);opacity:.45}
+.badge.on .ic{filter:none;opacity:1;background:var(--grad)}
+.badge.on{border-color:rgba(255,61,139,.5)}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);font-size:14px}
+th{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+tr.me td{background:rgba(255,61,139,.08)}
+.rank{font-family:"Bebas Neue";font-size:24px}
+
+.notice{padding:12px 14px;border-radius:12px;border:1px solid rgba(255,210,61,.35);background:rgba(255,210,61,.07);font-size:14px;color:#ffe9a8}
+.notice.t{border-color:rgba(45,226,230,.35);background:rgba(45,226,230,.07);color:#bff7f8}
+.empty{text-align:center;padding:30px;color:var(--mut);border:1px dashed var(--line);border-radius:14px}
+footer{border-top:1px solid var(--line);padding:30px 0;color:var(--mut);font-size:13px}
+footer ul{columns:2;gap:20px;margin-top:10px}
+footer li{list-style:none;margin-bottom:4px;break-inside:avoid}
+@media(max-width:640px){footer ul{columns:1}}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(5,3,10,.72);backdrop-filter:blur(4px);display:none;place-items:center;z-index:100;padding:20px}
+.modal.on{display:grid}
+.modal .box{background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:22px;width:100%;max-width:520px;max-height:90vh;overflow:auto}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--txt);color:var(--bg);font-weight:700;padding:10px 18px;border-radius:12px;z-index:200;transition:transform .3s;font-size:14px}
+.toast.on{transform:translateX(-50%) translateY(0)}
+.strm{display:flex;align-items:center;gap:12px}
+.av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#160a1c;flex:none}
+.plat{display:flex;gap:14px;align-items:center}
+.plat .ic{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-weight:900;font-size:20px;flex:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <div class="logo display" data-go="accueil"><div class="mark">VI</div><span>VICE</span><span class="g">HUB</span></div>
+    <nav class="tabs" id="tabs">
+      <button class="tab" data-go="accueil">Accueil</button>
+      <button class="tab" data-go="actus">Actus</button>
+      <button class="tab" data-go="streams">Streams</button>
+      <button class="tab" data-go="videos">Vidéos</button>
+      <button class="tab" data-go="profil">Mon profil</button>
+      <button class="tab" data-go="missions">Missions</button>
+      <button class="tab" data-go="classement">Classement</button>
+      <button class="tab" data-go="guide">Guide &amp; infos</button>
+    </nav>
+    <div class="savepill" id="savepill"><i class="dot" id="savedot"></i><span id="savetxt">Connexion…</span></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ACCUEIL -->
+<section class="view" id="v-accueil">
+  <div class="hero">
+    <svg class="sky" viewBox="0 0 1200 420" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs><linearGradient id="sun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#ff3d8b"/></linearGradient></defs>
+      <circle cx="930" cy="300" r="150" fill="url(#sun)" opacity=".9"/>
+      <g fill="#0a0614" opacity=".85">
+        <rect x="770" y="300" width="320" height="6"/><rect x="790" y="318" width="280" height="7"/><rect x="810" y="338" width="240" height="9"/>
+      </g>
+      <g fill="#14092a">
+        <rect x="560" y="250" width="38" height="170"/><rect x="604" y="210" width="30" height="210"/><rect x="640" y="270" width="44" height="150"/>
+        <rect x="690" y="190" width="26" height="230"/><rect x="722" y="240" width="40" height="180"/><rect x="1080" y="230" width="34" height="190"/><rect x="1120" y="270" width="50" height="150"/>
+        <path d="M0 420 L0 380 Q300 360 600 385 T1200 375 L1200 420Z"/>
+      </g>
+      <g stroke="#14092a" stroke-width="7" fill="none" stroke-linecap="round">
+        <path d="M120 420 Q128 320 150 250"/><path d="M300 420 Q292 330 270 270"/>
+      </g>
+      <g fill="#14092a">
+        <path d="M150 250 q-60 -10 -95 25 q45 -20 95 -18z"/><path d="M150 250 q55 -25 100 5 q-50 -10 -100 0z"/><path d="M150 250 q-20 -50 -70 -55 q40 20 66 57z"/><path d="M150 250 q30 -45 80 -40 q-45 15 -78 44z"/>
+        <path d="M270 270 q-55 -15 -95 15 q45 -15 95 -10z"/><path d="M270 270 q50 -25 95 0 q-50 -8 -95 5z"/><path d="M270 270 q-15 -45 -60 -55 q35 20 58 58z"/><path d="M270 270 q28 -40 72 -38 q-40 15 -70 42z"/>
+      </g>
+    </svg>
+    <div class="in">
+      <span class="tag" style="background:rgba(10,6,20,.5);color:#fff">Leonida · Vice City</span>
+      <h1 class="display" style="margin-top:12px">GTA VI<br>ARRIVE.</h1>
+      <p style="max-width:520px;font-weight:500;color:#fff4f8;margin-top:8px" id="heroLine">Sortie le jeudi 19 novembre 2026 sur PS5 et Xbox Series X|S, à minuit heure locale.</p>
+      <div class="cd" id="countdown"></div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn pri" data-go="profil">Créer mon profil joueur</button>
+        <button class="btn" data-go="missions" style="background:rgba(10,6,20,.55);border-color:rgba(255,255,255,.25)">Suivre mes missions</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g4" style="margin-top:18px">
+    <div class="card"><div class="muted small">Prix standard (US)</div><div class="stat g">79,99 $</div><div class="small muted">Ultimate : 99,99 $</div></div>
+    <div class="card"><div class="muted small">Taille d'installation</div><div class="stat t">212 Go</div><div class="small muted">Préchargement ouvert</div></div>
+    <div class="card"><div class="muted small">Plateformes</div><div class="stat g">PS5 · XSX|S</div><div class="small muted">PC : pas encore annoncé</div></div>
+    <div class="card"><div class="muted small">Ta progression</div><div class="stat t" id="homePct">0 %</div><div class="bar" style="margin-top:6px"><i id="homeBar" style="width:0"></i></div></div>
+  </div>
+
+  <div class="grid g2" style="margin-top:18px;grid-template-columns:1.4fr 1fr">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:6px"><h2 class="display" style="margin:0">Dernières actus</h2><button class="btn sm ghost" data-go="actus">Tout voir →</button></div>
+      <div id="homeNews"></div>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="card">
+        <h2 class="display" style="margin:0 0 10px">Regarder en direct</h2>
+        <p class="small muted" style="margin-bottom:12px">Les lives GTA VI explosent cette semaine. Ouvre directement les directs en cours :</p>
+        <div class="grid" id="homeStreams" style="gap:8px"></div>
+      </div>
+      <div class="card">
+        <h2 class="display" style="margin:0 0 10px">Mes missions en cours</h2>
+        <div id="homeMissions"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACTUS -->
+<section class="view" id="v-actus">
+  <h1 class="page display">Actualités GTA VI</h1>
+  <p class="sub">Les infos vérifiées sur GTA VI, ajoutées automatiquement toutes les heures. Chaque brève renvoie vers sa source.</p>
+  <p class="small muted" id="newsUpd" style="margin:-12px 0 16px;display:flex;gap:8px;align-items:center"></p>
+  <div class="filters" id="newsFilters"></div>
+  <div class="card" id="newsList"></div>
+  <div class="notice t" style="margin-top:16px">Pour suivre aussi l'actu en temps réel : <a href="https://www.rockstargames.com/newswire" target="_blank" rel="noopener">Rockstar Newswire</a> · <a href="https://www.rockstargames.com/VI" target="_blank" rel="noopener">site officiel GTA VI</a>.</div>
+</section>
+
+<!-- STREAMS -->
+<section class="view" id="v-streams">
+  <h1 class="page display">Streams en direct</h1>
+  <p class="sub">Accès direct aux lives GTA VI sur chaque plateforme, plus ta liste de streamers favoris. Chaque lien ouvre la plateforme dans un nouvel onglet.</p>
+  <div class="grid g4" id="platGrid"></div>
+
+  <h2 class="display">Lives par langue</h2>
+  <div class="row" id="langLinks"></div>
+
+  <div class="row" style="justify-content:space-between;align-items:end;margin-top:34px">
+    <h2 class="display" style="margin:0">Mes streamers favoris</h2>
+    <button class="btn pri sm" id="addStreamerBtn">+ Ajouter un streamer</button>
+  </div>
+  <p class="small muted" style="margin:6px 0 14px">Ajoute les chaînes que tu suis. Un clic ouvre leur chaîne : s'ils sont en live sur GTA VI, tu tombes directement dessus.</p>
+  <div class="grid g3" id="streamerList"></div>
+  <div class="notice" style="margin-top:16px">Le statut « en ligne / hors ligne » ne peut pas être lu depuis cette page (les plateformes ne l'autorisent pas ici) : l'ouverture se fait directement sur Twitch, YouTube, Kick ou TikTok.</div>
+</section>
+
+<!-- VIDEOS -->
+<section class="view" id="v-videos">
+  <h1 class="page display">Vidéos incontournables</h1>
+  <p class="sub">Toutes les vidéos officielles de Rockstar, des raccourcis vers les meilleures analyses et guides, et ta propre watchlist.</p>
+  <h2 class="display" style="margin-top:0">Officielles Rockstar</h2>
+  <div class="grid g4" id="officialVids"></div>
+
+  <h2 class="display">Analyses, guides &amp; découvertes</h2>
+  <div class="grid g4" id="topicVids"></div>
+
+  <div class="row" style="justify-content:space-between;align-items:end;margin-top:34px">
+    <h2 class="display" style="margin:0">Ma watchlist</h2>
+    <button class="btn pri sm" id="addVideoBtn">+ Ajouter une vidéo</button>
+  </div>
+  <p class="small muted" style="margin:6px 0 14px">Colle un lien YouTube, Twitch ou TikTok pour ne rien rater. Coche ce que tu as déjà vu.</p>
+  <div id="watchList"></div>
+</section>
+
+<!-- PROFIL -->
+<section class="view" id="v-profil">
+  <h1 class="page display">Mon profil joueur</h1>
+  <p class="sub">Ta carte de joueur GTA VI. Tout est sauvegardé automatiquement sur ton compte.</p>
+  <div class="grid g2" style="grid-template-columns:1fr 1.25fr">
+    <div class="card" id="idCard"></div>
+    <div class="card">
+      <h3 style="margin-bottom:14px">Modifier mon profil</h3>
+      <form id="profileForm" class="grid g2" style="gap:12px">
+        <div><label class="f">Pseudo</label><input name="pseudo" maxlength="24" placeholder="ViceKing_33"></div>
+        <div><label class="f">Plateforme</label><select name="plateforme"><option>PS5</option><option>PS5 Pro</option><option>Xbox Series X</option><option>Xbox Series S</option></select></div>
+        <div><label class="f">Édition</label><select name="edition"><option>Standard</option><option>Ultimate</option></select></div>
+        <div><label class="f">Protagoniste préféré</label><select name="perso"><option>Lucia</option><option>Jason</option><option>Les deux</option></select></div>
+        <div><label class="f">Heures de jeu</label><input name="heures" type="number" min="0" step="0.5" placeholder="0"></div>
+        <div><label class="f">Argent en jeu ($)</label><input name="argent" type="number" min="0" step="1" placeholder="0"></div>
+        <div><label class="f">Style de jeu</label><select name="style"><option>Histoire d'abord</option><option>Explorateur</option><option>Chasseur à 100 %</option><option>Chaos total</option><option>Pilote</option></select></div>
+        <div><label class="f">Début de partie</label><input name="debut" type="date"></div>
+        <div style="grid-column:1/-1"><label class="f">Bio</label><textarea name="bio" rows="2" maxlength="160" placeholder="Objectif : 100 % avant Noël."></textarea></div>
+        <div style="grid-column:1/-1" class="row">
+          <label class="row small" style="gap:8px;cursor:pointer"><input type="checkbox" name="public" style="width:auto"> Apparaître dans le classement de la communauté</label>
+        </div>
+        <div style="grid-column:1/-1" class="row"><button class="btn pri" type="submit">Enregistrer</button><span class="small muted" id="profMsg"></span></div>
+      </form>
+    </div>
+  </div>
+  <h2 class="display">Badges</h2>
+  <div class="grid g4" id="badges"></div>
+  <h2 class="display">Sauvegarde</h2>
+  <div class="card">
+    <p class="small muted" style="margin-bottom:12px">Exporte toutes tes données (profil, missions, streamers, watchlist) ou importe une sauvegarde.</p>
+    <div class="row"><button class="btn sm" id="exportBtn">Copier ma sauvegarde</button><button class="btn sm" id="importBtn">Importer une sauvegarde</button><button class="btn sm danger" id="resetBtn">Tout réinitialiser</button></div>
+  </div>
+</section>
+
+<!-- MISSIONS -->
+<section class="view" id="v-missions">
+  <h1 class="page display">Suivi des missions</h1>
+  <p class="sub">Ton carnet de route : missions d'histoire, braquages, activités, collectibles et défis perso. Ajoute-les au fil de ta partie et suis ta progression.</p>
+  <div class="grid g4" id="mStats"></div>
+  <div class="grid g2" style="grid-template-columns:1.6fr 1fr;margin-top:18px;align-items:start">
+    <div>
+      <div class="row" style="justify-content:space-between;margin-bottom:12px">
+        <div class="filters" id="mFilters" style="margin:0"></div>
+        <button class="btn pri sm" id="addMissionBtn">+ Nouvelle mission</button>
+      </div>
+      <div class="row" style="margin-bottom:12px"><input id="mSearch" placeholder="Rechercher une mission…" style="flex:1;min-width:180px"><select id="mStatus" style="width:auto"><option value="all">Tous les statuts</option><option value="0">À faire</option><option value="1">En cours</option><option value="2">Terminées</option></select></div>
+      <div id="mList"></div>
+    </div>
+    <div class="grid" style="gap:16px">
+      <div class="card"><h3>Exploration de Leonida</h3><p class="small muted" style="margin:4px 0 8px">Les régions dévoilées par Rockstar.</p><ul class="cl" id="clRegions"></ul></div>
+      <div class="card"><h3>Checklist jour J</h3><p class="small muted" style="margin:4px 0 8px">Pour être prêt à minuit.</p><ul class="cl" id="clLaunch"></ul></div>
+      <div class="card"><h3>Par catégorie</h3><div id="catBars" style="margin-top:10px"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CLASSEMENT -->
+<section class="view" id="v-classement">
+  <h1 class="page display">Classement communauté</h1>
+  <p class="sub">Les joueurs qui ont rendu leur profil public, classés par progression. Active l'option dans « Mon profil » pour y apparaître.</p>
+  <div class="card" id="lbBox"></div>
+</section>
+
+<!-- GUIDE -->
+<section class="view" id="v-guide">
+  <h1 class="page display">Guide &amp; infos clés</h1>
+  <p class="sub">Tout ce qui est confirmé sur GTA VI, en un coup d'œil.</p>
+  <div class="grid g2">
+    <div class="card"><h3 style="margin-bottom:8px">Fiche du jeu</h3><table id="factTable"></table></div>
+    <div class="card">
+      <h3 style="margin-bottom:8px">Heure de déblocage</h3>
+      <p class="small muted">Lancement échelonné : le jeu se débloque à minuit dans chaque fuseau horaire, pas au même moment partout.</p>
+      <table id="tzTable" style="margin-top:8px"></table>
+      <h3 style="margin:20px 0 8px">Les protagonistes</h3>
+      <div class="grid g2">
+        <div class="card" style="background:var(--bg2)"><span class="tag">Protagoniste</span><h3 class="display" style="font-size:30px;margin-top:6px">Lucia Caminos</h3><p class="small muted">Première protagoniste féminine d'un GTA principal moderne.</p></div>
+        <div class="card" style="background:var(--bg2)"><span class="tag t">Protagoniste</span><h3 class="display" style="font-size:30px;margin-top:6px">Jason Duval</h3><p class="small muted">Partenaire de Lucia ; le duo est au cœur de l'histoire.</p></div>
+      </div>
+    </div>
+  </div>
+  <h2 class="display">Questions fréquentes</h2>
+  <div class="grid g2" id="faq"></div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="display" style="font-size:22px;color:var(--txt)">VICE HUB</div>
+    <p>Site de fans non officiel, sans lien avec Rockstar Games ni Take-Two Interactive. Grand Theft Auto est une marque de Take-Two Interactive.</p>
+    <p style="margin-top:10px;font-weight:700;color:var(--txt)">Sources</p>
+    <ul id="sources"></ul>
+  </div>
+</footer>
+
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+/* ---------------- DATA ---------------- */
+const RELEASE = new Date(2026,10,19,0,0,0); // minuit heure locale
+const SRC = {
+  cnbc:{n:"CNBC",u:"https://www.cnbc.com/2026/11/14/gta-6-grand-theft-auto-launch.html"},
+  variety:{n:"Variety",u:"https://variety.com/2026/gaming/news/gta-6-preorders-expectations-launch-1236943278/"},
+  yahoo:{n:"Yahoo Tech",u:"https://tech.yahoo.com/gaming/breaking-news/article/gta-6-launches-thursday-and-is-available-for-pre-load-now-everything-you-need-to-know-about-the-new-rockstar-game-140009247.html"},
+  newsnation:{n:"NewsNation",u:"https://www.newsnationnow.com/entertainment-news/what-to-know-grand-theft-auto-vi-gta6/"},
+  macobs:{n:"The Mac Observer",u:"https://www.macobserver.com/news/gta-6-launch-day-release-date-platforms-price/"},
+  allthings:{n:"AllThings.How",u:"https://allthings.how/gta-6-release-date/"},
+  rockstar:{n:"Rockstar Newswire",u:"https://www.rockstargames.com/newswire/article/9k2kaa1o3297k9/grand-theft-auto-vi-an-extended-look"},
+  gtawiki:{n:"GTA Wiki",u:"https://gta.wiki/w/Grand_Theft_Auto_VI/Trailers"},
+  gtabase:{n:"GTABase",u:"https://www.gtabase.com/articles/gta-6/gta-6-delayed-again-now-releasing-november-19-2026"},
+  gamesradar:{n:"GamesRadar+",u:"https://www.gamesradar.com/games/grand-theft-auto/gta-6-delayed-6-more-months-as-rockstar-commits-to-november-2026-and-says-sorry"},
+  games:{n:"games.gg",u:"https://games.gg/fr/news/le-pdg-de-take-two-confirme-la-date-de-sortie-de-gta-6-au-19-novembre/"},
+  tweaktown:{n:"TweakTown",u:"https://tweaktown.com/hubs/gta-6/index.html"},
+  gamewiki:{n:"The Games Wiki",u:"https://thegameswiki.com/gta6/wiki/trailers/history/d9663e03-66dd-4f6a-92bf-32836fc36cc6"}
+};
+const NEWS = [
+  {d:"2026-11-14",c:"Lancement",t:"GTA VI pourrait bousculer le streaming… et les congés",s:"Créateurs, plateformes de streaming, livraison de repas et tourisme à Miami pourraient tous ressentir l'effet du lancement. Près d'un salarié sur cinq (aux États-Unis) prévoit de poser un congé pour l'occasion.",src:"cnbc"},
+  {d:"2026-11-12",c:"Lancement",t:"212 Go, 100 % numérique au lancement",s:"Le jeu occupera 212 Go sur la console. Il sort uniquement en version numérique le 19 novembre ; une édition physique est prévue pour 2027.",src:"newsnation"},
+  {d:"2026-11-10",c:"Business",t:"Précommandes « bien au-delà des attentes » selon Take-Two",s:"Strauss Zelnick affirme que les préventes dépassent largement les prévisions, tout en refusant de crier victoire avant la sortie. Prix confirmés : 79,99 $ (Standard) et 99,99 $ (Ultimate).",src:"variety"},
+  {d:"2026-11-10",c:"Lancement",t:"Le préchargement est ouvert",s:"Les joueurs ayant précommandé peuvent télécharger le jeu à l'avance depuis le 10 novembre. La précommande inclut le pack Vintage Vice City.",src:"macobs"},
+  {d:"2026-11-09",c:"Business",t:"Take-Two réaffirme la date du 19 novembre",s:"Dans son rapport trimestriel, l'éditeur confirme une nouvelle fois le calendrier de sortie sur PS5 et Xbox Series X|S.",src:"macobs"},
+  {d:"2026-11-05",c:"Rockstar",t:"Rockstar publie « Grand Theft Auto VI: The Festival »",s:"Nouvel article sur le Newswire officiel dans la dernière ligne droite avant la sortie.",src:"rockstar"},
+  {d:"2026-11-03",c:"Rockstar",t:"La galerie de lancement est en ligne",s:"Rockstar dévoile une large série de nouvelles captures du monde de Leonida.",src:"rockstar"},
+  {d:"2026-10-15",c:"Vidéo",t:"Le trailer de lancement est sorti",s:"Rockstar a publié le Launch Trailer de GTA VI le 15 octobre sur YouTube.",src:"gtawiki"},
+  {d:"2026-08-27",c:"Vidéo",t:"« An Extended Look » : 26 minutes de jeu sur Netflix",s:"Première vidéo officielle centrée sur du gameplay prolongé, diffusée d'abord sur Netflix puis sur YouTube et le site officiel.",src:"rockstar"},
+  {d:"2026-06-11",c:"Business",t:"Le PDG de Take-Two écarte tout nouveau report",s:"Strauss Zelnick confirme la sortie au 19 novembre 2026 et anticipe une année fiscale record.",src:"games"},
+  {d:"2025-11-06",c:"Date",t:"Deuxième report : direction le 19 novembre 2026",s:"Rockstar décale le jeu de six mois, du 26 mai au 19 novembre 2026, pour peaufiner le jeu, et s'excuse auprès des fans.",src:"gtabase"},
+  {d:"2025-05-06",c:"Vidéo",t:"Le Trailer 2 débarque par surprise",s:"Quelques jours après le premier report, Rockstar publie un deuxième trailer centré sur Jason et Lucia. Il remportera le prix du meilleur trailer aux Golden Joystick Awards 2025.",src:"gamewiki"},
+  {d:"2023-12-05",c:"Vidéo",t:"Le tout premier trailer de GTA VI",s:"Annonce officielle du retour à Vice City, dans l'État de Leonida.",src:"gtawiki"}
+];
+const OFFICIAL = [
+  {t:"Launch Trailer",d:"15 oct. 2026",len:"Officiel",q:"Grand Theft Auto VI Launch Trailer",bg:"linear-gradient(135deg,#ff3d8b,#ffd23d)",big:"LAUNCH"},
+  {t:"An Extended Look",d:"27 août 2026",len:"26:48",q:"Grand Theft Auto VI An Extended Look",bg:"linear-gradient(135deg,#7b2ff7,#ff3d8b)",big:"EXTENDED"},
+  {t:"Trailer 2",d:"6 mai 2025",len:"~2:45",q:"Grand Theft Auto VI Trailer 2",bg:"linear-gradient(135deg,#ff8a3d,#ff3d8b)",big:"TRAILER 2"},
+  {t:"Trailer 1",d:"5 déc. 2023",len:"~1:30",q:"Grand Theft Auto VI Trailer 1",bg:"linear-gradient(135deg,#2de2e6,#7b2ff7)",big:"TRAILER 1"}
+];
+const TOPICS = [
+  {t:"Analyses des trailers",q:"GTA 6 analyse trailer détails",tag:"Analyse"},
+  {t:"Premières heures de gameplay",q:"GTA 6 gameplay français",tag:"Gameplay"},
+  {t:"Guide débutant",q:"GTA 6 guide débutant astuces",tag:"Guide"},
+  {t:"Gagner de l'argent vite",q:"GTA 6 argent rapide",tag:"Guide"},
+  {t:"Carte de Leonida",q:"GTA 6 carte Leonida",tag:"Carte"},
+  {t:"Easter eggs & secrets",q:"GTA 6 easter eggs secrets",tag:"Secrets"},
+  {t:"Meilleurs véhicules",q:"GTA 6 meilleurs véhicules",tag:"Guide"},
+  {t:"Comparatif PS5 / PS5 Pro / Xbox",q:"GTA 6 PS5 Pro vs Xbox Series X comparatif",tag:"Tech"}
+];
+const PLATFORMS = [
+  {n:"Twitch",c:"#9146ff",i:"T",u:"https://www.twitch.tv/search?term=Grand%20Theft%20Auto%20VI",d:"Catégorie GTA VI"},
+  {n:"YouTube Live",c:"#ff0033",i:"▶",u:"https://www.youtube.com/results?search_query=GTA+6+live&sp=EgJAAQ%253D%253D",d:"Lives filtrés"},
+  {n:"Kick",c:"#53fc18",i:"K",u:"https://kick.com/search?query=gta%206",d:"Lives GTA 6"},
+  {n:"TikTok Live",c:"#25f4ee",i:"♪",u:"https://www.tiktok.com/search/live?q=gta%206",d:"Lives GTA 6"}
+];
+const LANGS = [
+  ["🇫🇷 Français","https://www.youtube.com/results?search_query=GTA+6+live+fr&sp=EgJAAQ%253D%253D"],
+  ["🇬🇧 English","https://www.youtube.com/results?search_query=GTA+6+live+english&sp=EgJAAQ%253D%253D"],
+  ["🇪🇸 Español","https://www.youtube.com/results?search_query=GTA+6+en+vivo&sp=EgJAAQ%253D%253D"],
+  ["🇧🇷 Português","https://www.youtube.com/results?search_query=GTA+6+ao+vivo&sp=EgJAAQ%253D%253D"],
+  ["🇩🇪 Deutsch","https://www.youtube.com/results?search_query=GTA+6+live+deutsch&sp=EgJAAQ%253D%253D"],
+  ["🇮🇹 Italiano","https://www.youtube.com/results?search_query=GTA+6+live+ita&sp=EgJAAQ%253D%253D"]
+];
+const REGIONS = ["Vice City","Leonida Keys","Grassrivers","Port Gellhorn","Ambrosia","Mount Kalaga"];
+const LAUNCH = ["Précommander le jeu","Lancer le préchargement (212 Go)","Libérer de l'espace sur la console","Mettre la console à jour","Prévoir snacks et boissons","Poser son jour de congé 😏","Prévenir ses potes du créneau"];
+const CATS = ["Histoire","Braquage","Annexe","Activité","Collectible","Défi perso"];
+const CATCLS = {"Histoire":"","Braquage":"o","Annexe":"t","Activité":"p","Collectible":"g","Défi perso":"o"};
+const FACTS = [
+  ["Date de sortie","Jeudi 19 novembre 2026"],["Heure","Minuit, heure locale"],["Plateformes","PS5 · Xbox Series X|S"],["PC","Pas encore annoncé"],
+  ["Prix (US)","79,99 $ Standard · 99,99 $ Ultimate"],["Format","Numérique au lancement · physique en 2027"],["Taille","212 Go"],
+  ["Bonus précommande","Pack Vintage Vice City"],["Cadre","État de Leonida (Floride fictive), Vice City"],["Protagonistes","Lucia Caminos & Jason Duval"],
+  ["GTA Online VI","Pas au lancement, attendu en 2027 selon la presse"],["Développeur","Rockstar Games (Take-Two Interactive)"]
+];
+const FAQ = [
+  ["À quelle heure sort GTA VI ?","À minuit heure locale le 19 novembre. En France, ça tombe dans la nuit du mercredi 18 au jeudi 19 novembre."],
+  ["Y aura-t-il une version PC ?","Pas au lancement, et Rockstar n'a annoncé aucune date. Historiquement, GTA V est arrivé sur PC 19 mois après la sortie console et Red Dead Redemption 2 après 13 mois."],
+  ["Peut-on acheter une version physique ?","Pas le jour de la sortie : GTA VI sort en numérique uniquement, une version physique étant prévue pour 2027."],
+  ["Combien d'espace faut-il ?","212 Go. Pense à libérer de la place avant de lancer le préchargement."],
+  ["GTA Online sera-t-il dispo au lancement ?","Non. Le mode en ligne de GTA VI n'a pas de date ; la presse l'attend plutôt en 2027."],
+  ["Où se passe le jeu ?","Dans l'État fictif de Leonida, inspiré de la Floride, avec un retour à Vice City version moderne."]
+];
+
+/* ---------------- STATE ---------------- */
+const DEFAULT = ()=>({v:1,profile:{pseudo:"",plateforme:"PS5",edition:"Standard",perso:"Lucia",heures:"",argent:"",style:"Histoire d'abord",debut:"",bio:"",public:false},
+  missions:[],regions:{},launch:{},streamers:[],videos:[],updated:0});
+let S = DEFAULT();
+let db=null, user=null, uid=null, myDoc=null, mode="init";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uidGen=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+const fmtD=iso=>{const d=new Date(iso+"T12:00:00");return {day:d.getDate(),mon:d.toLocaleDateString("fr-FR",{month:"short"}),y:d.getFullYear(),full:d.toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"})}};
+const money=n=>(+n||0).toLocaleString("fr-FR")+" $";
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("on"),2200)}
+function setSave(kind,txt){$("#savedot").className="dot "+(kind||"");$("#savetxt").textContent=txt}
+
+function lsGet(){try{const r=localStorage.getItem("vicehub_state");return r?JSON.parse(r):null}catch(e){return null}}
+function lsSet(){try{localStorage.setItem("vicehub_state",JSON.stringify(S))}catch(e){}}
+function norm(x){const d=DEFAULT();if(!x||typeof x!=="object")return d;return {...d,...x,profile:{...d.profile,...(x.profile||{})},missions:Array.isArray(x.missions)?x.missions:[],streamers:Array.isArray(x.streamers)?x.streamers:[],videos:Array.isArray(x.videos)?x.videos:[],regions:x.regions||{},launch:x.launch||{}}}
+function snapData(s){if(!s)return null;if(typeof s.data==="function")return s.exists===false?null:s.data();if(s.data&&typeof s.data==="object")return s.data;return s}
+function snapDocs(s){if(!s)return[];const arr=Array.isArray(s)?s:(s.docs||[]);return arr.map(d=>{const v=snapData(d)||{};return {id:d.id||v.id,...v}})}
+
+let saveTimer=null,saving=false,dirty=false;
+function save(){S.updated=Date.now();lsSet();renderAll();clearTimeout(saveTimer);saveTimer=setTimeout(flush,700)}
+async function flush(){
+  if(!myDoc){setSave("warn","Sauvegarde locale");return}
+  if(saving){dirty=true;return}
+  saving=true;setSave("","Sauvegarde…");
+  try{await myDoc.set(JSON.parse(JSON.stringify(S)));setSave("ok","Sauvegardé");await pushLeaderboard()}
+  catch(e){setSave("warn","Sauvegarde locale")}
+  saving=false;if(dirty){dirty=false;flush()}
+}
+
+/* ---------- computed ---------- */
+function stats(){
+  const m=S.missions,done=m.filter(x=>x.s===2).length,prog=m.filter(x=>x.s===1).length;
+  const reg=REGIONS.filter(r=>S.regions[r]).length;
+  const total=m.length+REGIONS.length, got=done+reg;
+  const pct=total?Math.round(got/total*100):0;
+  const reward=m.filter(x=>x.s===2).reduce((a,x)=>a+(+x.r||0),0);
+  return {done,prog,todo:m.length-done-prog,total:m.length,reg,pct,reward};
+}
+function badges(){
+  const st=stats(),p=S.profile,h=+p.heures||0,a=+p.argent||0;
+  const cnt=c=>S.missions.filter(x=>x.c===c&&x.s===2).length;
+  return [
+    {i:"🪪",n:"Nouveau citoyen",d:"Choisir un pseudo",on:!!p.pseudo},
+    {i:"🌴",n:"Bienvenue à Vice",d:"Explorer Vice City",on:!!S.regions["Vice City"]},
+    {i:"🗺️",n:"Cartographe",d:"Explorer les 6 régions",on:st.reg===6},
+    {i:"🎬",n:"Premier contrat",d:"Terminer 1 mission",on:st.done>=1},
+    {i:"🔥",n:"Enchaîneur",d:"Terminer 10 missions",on:st.done>=10},
+    {i:"👑",n:"Légende de Leonida",d:"Terminer 50 missions",on:st.done>=50},
+    {i:"💰",n:"Braqueur",d:"Réussir 3 braquages",on:cnt("Braquage")>=3},
+    {i:"💎",n:"Millionnaire",d:"Avoir 1 000 000 $",on:a>=1e6},
+    {i:"⏱️",n:"Accro",d:"Jouer 50 heures",on:h>=50},
+    {i:"🧭",n:"Collectionneur",d:"5 collectibles trouvés",on:cnt("Collectible")>=5},
+    {i:"📺",n:"Spectateur",d:"Ajouter 3 streamers",on:S.streamers.length>=3},
+    {i:"✅",n:"Prêt pour minuit",d:"Checklist jour J complète",on:LAUNCH.every(l=>S.launch[l])}
+  ];
+}
+
+/* ---------------- RENDER ---------------- */
+function renderCountdown(){
+  const el=$("#countdown"),now=new Date(),ms=RELEASE-now;
+  if(ms<=0){el.innerHTML='<div style="min-width:auto;padding:14px 20px"><b style="font-size:40px">DISPONIBLE</b><small>Bon jeu à Leonida</small></div>';$("#heroLine").textContent="GTA VI est sorti sur PS5 et Xbox Series X|S. Lance-toi et suis ta progression ici.";return}
+  const d=Math.floor(ms/864e5),h=Math.floor(ms/36e5)%24,m=Math.floor(ms/6e4)%60,s=Math.floor(ms/1e3)%60;
+  el.innerHTML=[[d,"jours"],[h,"heures"],[m,"minutes"],[s,"secondes"]].map(([v,l])=>`<div><b>${String(v).padStart(2,"0")}</b><small>${l}</small></div>`).join("");
+}
+let DBNEWS=[];
+const safeUrl=u=>/^https:\/\//i.test(String(u||""))?String(u):"#";
+function allNews(){const m=new Map();
+  const live=DBNEWS.filter(n=>n&&n.t&&/^\d{4}-\d{2}-\d{2}/.test(n.d||"")).map(n=>({d:String(n.d).slice(0,10),ts:n.ts||n.d,c:n.c||"Actu",t:n.t,s:n.s||"",sn:n.sn||"Source",su:n.su,live:true}));
+  [...live,...NEWS].forEach(n=>{const k=n.t.toLowerCase().trim();if(!m.has(k))m.set(k,n)});
+  return [...m.values()].sort((a,b)=>String(b.ts||b.d).localeCompare(String(a.ts||a.d)))}
+function newsItem(n){const f=fmtD(n.d),s=n.src?SRC[n.src]:{n:n.sn,u:safeUrl(n.su)};const fresh=n.live&&n.ts&&(Date.now()-new Date(n.ts))<864e5;return `<div class="news"><div class="d">${f.day} ${esc(f.mon)}<small>${f.y}</small></div><div>${fresh?'<span class="tag g" style="margin-right:6px">Nouveau</span>':""}<span class="tag ${n.c==="Vidéo"?"t":n.c==="Business"?"o":n.c==="Rockstar"?"p":n.c==="Date"?"g":""}">${esc(n.c)}</span><h3 style="margin-top:6px">${esc(n.t)}</h3><p class="small muted">${esc(n.s)}</p><a class="small" href="${s.u}" target="_blank" rel="noopener">Source : ${esc(s.n)} ↗</a></div></div>`}
+let newsCat="Tout";
+function renderNews(){
+  const ALL=allNews();const cats=["Tout",...new Set(ALL.map(n=>n.c))];
+  $("#newsFilters").innerHTML=cats.map(c=>`<button class="chip ${c===newsCat?"on":""}" data-nc="${esc(c)}">${esc(c)}</button>`).join("");
+  $("#newsList").innerHTML=ALL.filter(n=>newsCat==="Tout"||n.c===newsCat).map(newsItem).join("");
+  $("#homeNews").innerHTML=ALL.slice(0,4).map(newsItem).join("");
+  const last=DBNEWS.map(n=>n&&n.ts).filter(Boolean).sort().pop();
+  $("#newsUpd").innerHTML=last?`<i class="dot ok"></i> Fil mis à jour automatiquement toutes les heures · dernière actu ajoutée le ${esc(new Date(last).toLocaleString("fr-FR",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}))}`:`<i class="dot ok"></i> Fil mis à jour automatiquement toutes les heures`;
+}
+function streamerUrl(x){const h=encodeURIComponent(x.h.replace(/^@/,""));return x.p==="YouTube"?`https://www.youtube.com/@${h}/live`:x.p==="Kick"?`https://kick.com/${h}`:x.p==="TikTok"?`https://www.tiktok.com/@${h}/live`:`https://www.twitch.tv/${h}`}
+const PCOL={Twitch:"#9146ff",YouTube:"#ff0033",Kick:"#53fc18",TikTok:"#25f4ee"};
+function renderStreams(){
+  const pl=PLATFORMS.map(p=>`<a class="card hov plat" href="${p.u}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none"><div class="ic" style="background:${p.c};color:#0a0614">${p.i}</div><div><h3>${p.n}</h3><div class="small muted"><i class="dot live"></i> ${p.d}</div></div></a>`).join("");
+  $("#platGrid").innerHTML=pl;
+  $("#homeStreams").innerHTML=PLATFORMS.map(p=>`<a class="btn" href="${p.u}" target="_blank" rel="noopener" style="justify-content:space-between"><span class="row" style="gap:10px"><span class="av" style="width:26px;height:26px;background:${p.c};font-size:13px">${p.i}</span>${p.n}</span><span class="small muted"><i class="dot live"></i> live</span></a>`).join("");
+  $("#langLinks").innerHTML=LANGS.map(([l,u])=>`<a class="btn sm" href="${u}" target="_blank" rel="noopener">${l}</a>`).join("");
+  const L=$("#streamerList");
+  if(!S.streamers.length){L.innerHTML=`<div class="empty" style="grid-column:1/-1">Aucun streamer pour l'instant. Ajoute ceux que tu suis pour les retrouver en un clic.</div>`;return}
+  L.innerHTML=S.streamers.map(x=>`<div class="card"><div class="strm"><div class="av" style="background:${PCOL[x.p]||"#fff"}">${esc((x.h.replace(/^@/,"")[0]||"?").toUpperCase())}</div><div style="flex:1;min-width:0"><h3 style="overflow:hidden;text-overflow:ellipsis">${esc(x.h)}</h3><div class="small muted">${esc(x.p)}${x.note?" · "+esc(x.note):""}</div></div></div><div class="row" style="margin-top:12px"><a class="btn sm pri" href="${streamerUrl(x)}" target="_blank" rel="noopener">Ouvrir la chaîne</a><button class="btn sm ghost danger" data-delstr="${x.id}">Retirer</button></div></div>`).join("");
+}
+function ytSearch(q,channel){return channel?`https://www.youtube.com/@RockstarGames/search?query=${encodeURIComponent(q)}`:`https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`}
+function renderVideos(){
+  const play='<svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>';
+  $("#officialVids").innerHTML=OFFICIAL.map(v=>`<a class="card hov" href="${ytSearch(v.q,true)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;padding:12px"><div class="vthumb" style="background:${v.bg}"><span class="big">${v.big}</span><div class="play">${play}</div><span class="len">${v.len}</span></div><span class="tag">Rockstar</span><h3 style="margin-top:6px">${esc(v.t)}</h3><div class="small muted">${esc(v.d)}</div></a>`).join("");
+  const cols=["#ff3d8b","#2de2e6","#ff8a3d","#8b5cf6"];
+  $("#topicVids").innerHTML=TOPICS.map((v,i)=>`<a class="card hov" href="${ytSearch(v.q)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;padding:12px"><div class="vthumb" style="background:linear-gradient(135deg,${cols[i%4]}55,#170e2b);border:1px solid var(--line)"><div class="play">${play}</div></div><span class="tag t">${esc(v.tag)}</span><h3 style="margin-top:6px">${esc(v.t)}</h3><div class="small muted">Les vidéos les plus récentes ↗</div></a>`).join("");
+  const W=$("#watchList");
+  if(!S.videos.length){W.innerHTML=`<div class="empty">Ta watchlist est vide. Ajoute les vidéos que tu ne veux pas rater.</div>`;return}
+  W.innerHTML=S.videos.map(v=>`<div class="mrow ${v.seen?"done":""}"><button class="chk ${v.seen?"s2":""}" data-seen="${v.id}" title="Marquer comme vue">${v.seen?"✓":""}</button><div style="min-width:0"><div class="mt" style="overflow:hidden;text-overflow:ellipsis">${esc(v.t||v.u)}</div><div class="meta"><a class="small" href="${esc(v.u)}" target="_blank" rel="noopener">Ouvrir ↗</a></div></div><button class="btn sm ghost danger" data-delvid="${v.id}">✕</button></div>`).join("");
+}
+function renderProfile(){
+  const p=S.profile,st=stats(),f=$("#profileForm");
+  if(document.activeElement?.form!==f){
+    for(const k of Object.keys(p)){const el=f.elements[k];if(!el)continue;if(el.type==="checkbox")el.checked=!!p[k];else el.value=p[k]??""}
+  }
+  const ini=(p.pseudo||"?").slice(0,2).toUpperCase();
+  $("#idCard").innerHTML=`
+   <div style="border-radius:14px;padding:20px;background:linear-gradient(160deg,#2b0f4a,#7a1a5e 55%,#ff5a6e);position:relative;overflow:hidden">
+    <div class="small" style="letter-spacing:.2em;font-weight:800;color:#ffd9e8">ÉTAT DE LEONIDA · PERMIS DE JOUEUR</div>
+    <div class="row" style="margin-top:14px;gap:16px;align-items:center">
+      <div class="av display" style="width:74px;height:74px;font-size:34px;background:var(--grad);border-radius:16px">${esc(ini)}</div>
+      <div><div class="display" style="font-size:40px;line-height:1">${esc(p.pseudo||"Joueur anonyme")}</div><div class="small" style="color:#ffe2ef">${esc(p.plateforme)} · Édition ${esc(p.edition)} · Team ${esc(p.perso)}</div></div>
+    </div>
+    ${p.bio?`<p class="small" style="margin-top:12px;color:#fff">« ${esc(p.bio)} »</p>`:""}
+   </div>
+   <div class="grid g2" style="margin-top:14px;gap:10px">
+    <div class="card" style="background:var(--bg2);padding:12px"><div class="small muted">Progression</div><div class="stat g">${st.pct} %</div></div>
+    <div class="card" style="background:var(--bg2);padding:12px"><div class="small muted">Missions terminées</div><div class="stat t">${st.done}</div></div>
+    <div class="card" style="background:var(--bg2);padding:12px"><div class="small muted">Heures de jeu</div><div class="stat g">${(+p.heures||0).toLocaleString("fr-FR")} h</div></div>
+    <div class="card" style="background:var(--bg2);padding:12px"><div class="small muted">Argent</div><div class="stat t" style="font-size:34px">${money(p.argent)}</div></div>
+   </div>
+   <div class="small muted" style="margin-top:12px">Style : ${esc(p.style)}${p.debut?" · Début : "+esc(new Date(p.debut).toLocaleDateString("fr-FR")):""} · Régions explorées : ${st.reg}/6 · ${p.public?'<span style="color:var(--green)">Profil public</span>':"Profil privé"}</div>`;
+  $("#badges").innerHTML=badges().map(b=>`<div class="badge ${b.on?"on":""}"><div class="ic">${b.i}</div><div><h3 style="font-size:14px">${esc(b.n)}</h3><div class="small muted">${esc(b.d)}</div></div></div>`).join("");
+}
+let mCat="Toutes";
+function renderMissions(){
+  const st=stats();
+  $("#mStats").innerHTML=`
+   <div class="card"><div class="small muted">Progression globale</div><div class="stat g">${st.pct} %</div><div class="bar"><i style="width:${st.pct}%"></i></div></div>
+   <div class="card"><div class="small muted">Terminées</div><div class="stat t">${st.done}<span class="small muted" style="font-family:Inter"> / ${st.total}</span></div></div>
+   <div class="card"><div class="small muted">En cours</div><div class="stat g">${st.prog}</div></div>
+   <div class="card"><div class="small muted">Gains cumulés</div><div class="stat t" style="font-size:36px">${money(st.reward)}</div></div>`;
+  $("#mFilters").innerHTML=["Toutes",...CATS].map(c=>`<button class="chip ${c===mCat?"on":""}" data-mc="${esc(c)}">${esc(c)}</button>`).join("");
+  const q=($("#mSearch").value||"").toLowerCase(),sf=$("#mStatus").value;
+  const list=S.missions.filter(m=>(mCat==="Toutes"||m.c===mCat)&&(sf==="all"||String(m.s)===sf)&&(!q||(m.t+" "+(m.n||"")+" "+(m.reg||"")).toLowerCase().includes(q)))
+    .sort((a,b)=>(a.s===2)-(b.s===2)||(b.s===1)-(a.s===1)||b.at-a.at);
+  const L=$("#mList");
+  if(!S.missions.length)L.innerHTML=`<div class="empty">Aucune mission suivie pour l'instant.<br><br><button class="btn pri sm" data-add-m>+ Ajouter ma première mission</button></div>`;
+  else if(!list.length)L.innerHTML=`<div class="empty">Aucune mission ne correspond à ces filtres.</div>`;
+  else L.innerHTML=list.map(m=>`<div class="mrow ${m.s===2?"done":""}"><button class="chk ${m.s===1?"s1":m.s===2?"s2":""}" data-cyc="${m.id}" title="Changer le statut">${m.s===2?"✓":m.s===1?"…":""}</button><div style="min-width:0"><div class="mt">${esc(m.t)}</div><div class="meta"><span class="tag ${CATCLS[m.c]||""}">${esc(m.c)}</span>${m.reg?`<span class="small muted">📍 ${esc(m.reg)}</span>`:""}${+m.r?`<span class="small" style="color:var(--green)">+${money(m.r)}</span>`:""}<span class="small muted">${["À faire","En cours","Terminée"][m.s]}</span></div>${m.n?`<div class="small muted" style="margin-top:4px">${esc(m.n)}</div>`:""}</div><div class="row" style="gap:4px"><button class="btn sm ghost" data-edm="${m.id}">✎</button><button class="btn sm ghost danger" data-delm="${m.id}">✕</button></div></div>`).join("");
+  const cl=(arr,obj,key)=>arr.map(x=>`<li class="${obj[x]?"done":""}" data-${key}="${esc(x)}"><span class="chk ${obj[x]?"s2":""}">${obj[x]?"✓":""}</span><span class="l">${esc(x)}</span></li>`).join("");
+  $("#clRegions").innerHTML=cl(REGIONS,S.regions,"reg");
+  $("#clLaunch").innerHTML=cl(LAUNCH,S.launch,"lch");
+  $("#catBars").innerHTML=CATS.map(c=>{const all=S.missions.filter(m=>m.c===c),d=all.filter(m=>m.s===2).length,p=all.length?Math.round(d/all.length*100):0;return `<div style="margin-bottom:10px"><div class="row small" style="justify-content:space-between"><span>${esc(c)}</span><span class="muted">${d}/${all.length}</span></div><div class="bar" style="height:7px"><i style="width:${p}%"></i></div></div>`}).join("");
+  // home
+  $("#homePct").textContent=st.pct+" %";$("#homeBar").style.width=st.pct+"%";
+  const cur=S.missions.filter(m=>m.s===1).slice(0,4);
+  $("#homeMissions").innerHTML=cur.length?cur.map(m=>`<div class="row small" style="padding:6px 0;border-bottom:1px dashed var(--line)"><span class="tag ${CATCLS[m.c]||""}">${esc(m.c)}</span>${esc(m.t)}</div>`).join(""):`<p class="small muted">Rien en cours. <a href="#missions" data-go="missions">Ajoute une mission →</a></p>`;
+}
+let LB=[];
+function renderLB(){
+  const B=$("#lbBox");
+  if(!db){B.innerHTML=`<div class="empty">Le classement s'affiche quand tu es connecté à ton compte Claude.</div>`;return}
+  if(!LB.length){B.innerHTML=`<div class="empty">Personne dans le classement pour l'instant. Rends ton profil public dans « Mon profil » pour ouvrir le bal !</div>`;return}
+  const rows=[...LB].sort((a,b)=>(b.pct||0)-(a.pct||0)||(b.done||0)-(a.done||0)||(b.h||0)-(a.h||0));
+  B.innerHTML=`<table><thead><tr><th>#</th><th>Joueur</th><th>Plateforme</th><th>Progression</th><th>Missions</th><th>Heures</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${r.id===uid?"me":""}"><td class="rank" style="color:${i===0?"var(--yellow)":i===1?"#d6d6e6":i===2?"var(--orange)":"var(--mut)"}">${i+1}</td><td><b>${esc(r.pseudo||"Anonyme")}</b>${r.id===uid?' <span class="tag">toi</span>':""}<div class="small muted">Team ${esc(r.perso||"?")}</div></td><td class="small">${esc(r.plat||"")}</td><td style="min-width:140px"><div class="small">${r.pct||0} %</div><div class="bar" style="height:6px"><i style="width:${r.pct||0}%"></i></div></td><td>${r.done||0}</td><td>${(r.h||0).toLocaleString("fr-FR")} h</td></tr>`).join("")}</tbody></table>`;
+}
+function renderGuide(){
+  $("#factTable").innerHTML=FACTS.map(([k,v])=>`<tr><td class="muted small" style="width:42%">${esc(k)}</td><td style="font-weight:600">${esc(v)}</td></tr>`).join("");
+  const zones=[["Ton heure locale",Intl.DateTimeFormat().resolvedOptions().timeZone],["Paris","Europe/Paris"],["Londres","Europe/London"],["Montréal / New York","America/New_York"],["Los Angeles","America/Los_Angeles"],["Tokyo","Asia/Tokyo"],["Sydney","Australia/Sydney"]];
+  $("#tzTable").innerHTML=zones.map(([n,z])=>`<tr><td class="small">${esc(n)}</td><td class="small" style="font-weight:600">19 nov. · 00:00</td><td class="small muted">${esc(z||"")}</td></tr>`).join("");
+  $("#faq").innerHTML=FAQ.map(([q,a])=>`<div class="card"><h3 style="margin-bottom:6px">${esc(q)}</h3><p class="small muted">${esc(a)}</p></div>`).join("");
+  const seen=new Set();$("#sources").innerHTML=Object.values(SRC).filter(s=>!seen.has(s.u)&&seen.add(s.u)).map(s=>`<li><a href="${s.u}" target="_blank" rel="noopener">${esc(s.n)}</a></li>`).join("");
+}
+function renderAll(){renderNews();renderStreams();renderVideos();renderProfile();renderMissions();renderLB()}
+
+/* ---------------- ROUTING ---------------- */
+const VIEWS=["accueil","actus","streams","videos","profil","missions","classement","guide"];
+function go(v){if(!VIEWS.includes(v))v="accueil";$$("section.view").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));$$(".tab").forEach(t=>t.classList.toggle("on",t.dataset.go===v));if(location.hash!=="#"+v){try{history.replaceState(null,"","#"+v)}catch(e){location.hash=v}}window.scrollTo({top:0,behavior:"smooth"})}
+window.addEventListener("hashchange",()=>go(location.hash.slice(1)));
+
+/* ---------------- MODALS ---------------- */
+function modal(html,onSubmit){const M=$("#modal");$("#modalBox").innerHTML=html;M.classList.add("on");const f=$("#modalBox form");if(f){f.addEventListener("submit",e=>{e.preventDefault();if(onSubmit(new FormData(f))!==false)close()});setTimeout(()=>f.querySelector("input,textarea")?.focus(),50)}
+  $$("#modalBox [data-close]").forEach(b=>b.onclick=close);function close(){M.classList.remove("on")}return close}
+$("#modal").addEventListener("click",e=>{if(e.target.id==="modal")$("#modal").classList.remove("on")});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("#modal").classList.remove("on")});
+function missionModal(m){
+  const e=m||{t:"",c:"Histoire",reg:"",r:"",n:"",s:0};
+  modal(`<h2 class="display" style="margin:0 0 14px">${m?"Modifier la mission":"Nouvelle mission"}</h2>
+   <form class="grid" style="gap:12px">
+    <div><label class="f">Nom de la mission</label><input name="t" required maxlength="80" value="${esc(e.t)}" placeholder="Ex. : Le casse du port"></div>
+    <div class="grid g2" style="gap:12px">
+      <div><label class="f">Catégorie</label><select name="c">${CATS.map(c=>`<option ${c===e.c?"selected":""}>${c}</option>`).join("")}</select></div>
+      <div><label class="f">Statut</label><select name="s">${["À faire","En cours","Terminée"].map((l,i)=>`<option value="${i}" ${i===e.s?"selected":""}>${l}</option>`).join("")}</select></div>
+      <div><label class="f">Région</label><select name="reg"><option value="">—</option>${REGIONS.map(r=>`<option ${r===e.reg?"selected":""}>${r}</option>`).join("")}<option ${e.reg==="Autre"?"selected":""}>Autre</option></select></div>
+      <div><label class="f">Récompense ($)</label><input name="r" type="number" min="0" value="${esc(e.r)}"></div>
+    </div>
+    <div><label class="f">Notes</label><textarea name="n" rows="3" maxlength="300" placeholder="Astuce, personnage, objectif bonus…">${esc(e.n)}</textarea></div>
+    <div class="row" style="justify-content:flex-end"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn pri">${m?"Enregistrer":"Ajouter"}</button></div>
+   </form>`,fd=>{
+    const o={t:fd.get("t").trim(),c:fd.get("c"),s:+fd.get("s"),reg:fd.get("reg"),r:fd.get("r"),n:fd.get("n").trim()};if(!o.t)return false;
+    if(m)Object.assign(m,o);else S.missions.push({id:uidGen(),at:Date.now(),...o});
+    save();toast(m?"Mission mise à jour":"Mission ajoutée");
+  });
+}
+
+/* ---------------- EVENTS ---------------- */
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-go],[data-nc],[data-mc],[data-cyc],[data-edm],[data-delm],[data-reg],[data-lch],[data-delstr],[data-seen],[data-delvid],[data-add-m]");
+  if(!t)return;const d=t.dataset;
+  if(d.go){e.preventDefault();go(d.go)}
+  else if(d.nc){newsCat=d.nc;renderNews()}
+  else if(d.mc){mCat=d.mc;renderMissions()}
+  else if(d.cyc){const m=S.missions.find(x=>x.id===d.cyc);if(m){m.s=(m.s+1)%3;save();if(m.s===2)toast("Mission terminée 🎉")}}
+  else if(d.edm){missionModal(S.missions.find(x=>x.id===d.edm))}
+  else if(d.delm){const m=S.missions.find(x=>x.id===d.delm);modal(`<h3>Supprimer « ${esc(m?.t)} » ?</h3><p class="small muted" style="margin:8px 0 16px">Cette mission sera retirée de ton suivi.</p><div class="row" style="justify-content:flex-end"><button class="btn ghost" data-close>Annuler</button><button class="btn pri" id="cfm">Supprimer</button></div>`);$("#cfm").onclick=()=>{S.missions=S.missions.filter(x=>x.id!==d.delm);save();$("#modal").classList.remove("on")}}
+  else if(d.reg){S.regions[d.reg]=!S.regions[d.reg];save()}
+  else if(d.lch){S.launch[d.lch]=!S.launch[d.lch];save()}
+  else if(d.delstr){S.streamers=S.streamers.filter(x=>x.id!==d.delstr);save()}
+  else if(d.seen){const v=S.videos.find(x=>x.id===d.seen);if(v){v.seen=!v.seen;save()}}
+  else if(d.delvid){S.videos=S.videos.filter(x=>x.id!==d.delvid);save()}
+  else if("addM" in d){missionModal()}
+});
+$("#addMissionBtn").onclick=()=>missionModal();
+$("#mSearch").oninput=renderMissions;$("#mStatus").onchange=renderMissions;
+$("#addStreamerBtn").onclick=()=>modal(`<h2 class="display" style="margin:0 0 14px">Ajouter un streamer</h2><form class="grid" style="gap:12px">
+  <div><label class="f">Pseudo de la chaîne</label><input name="h" required maxlength="40" placeholder="nom_de_la_chaine"></div>
+  <div class="grid g2" style="gap:12px"><div><label class="f">Plateforme</label><select name="p"><option>Twitch</option><option>YouTube</option><option>Kick</option><option>TikTok</option></select></div><div><label class="f">Note (facultatif)</label><input name="note" maxlength="30" placeholder="RP, speedrun…"></div></div>
+  <div class="row" style="justify-content:flex-end"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn pri">Ajouter</button></div></form>`,fd=>{const h=fd.get("h").trim().replace(/\s+/g,"");if(!h)return false;S.streamers.push({id:uidGen(),h,p:fd.get("p"),note:fd.get("note").trim()});save();toast("Streamer ajouté")});
+$("#addVideoBtn").onclick=()=>modal(`<h2 class="display" style="margin:0 0 14px">Ajouter une vidéo</h2><form class="grid" style="gap:12px">
+  <div><label class="f">Lien</label><input name="u" required type="url" placeholder="https://www.youtube.com/watch?v=…"></div>
+  <div><label class="f">Titre (facultatif)</label><input name="t" maxlength="90" placeholder="Analyse complète du trailer 2"></div>
+  <div class="row" style="justify-content:flex-end"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn pri">Ajouter</button></div></form>`,fd=>{const u=fd.get("u").trim();if(!/^https?:\/\//i.test(u))return false;S.videos.unshift({id:uidGen(),u,t:fd.get("t").trim(),seen:false});save();toast("Ajoutée à ta watchlist")});
+$("#profileForm").addEventListener("submit",e=>{e.preventDefault();const f=e.target,p=S.profile;
+  for(const k of Object.keys(p)){const el=f.elements[k];if(!el)continue;p[k]=el.type==="checkbox"?el.checked:el.value.trim()}
+  if(p.public&&!p.pseudo){toast("Choisis un pseudo pour apparaître au classement");p.public=false}
+  document.activeElement?.blur();save();toast("Profil enregistré");$("#profMsg").textContent="Enregistré ✓";setTimeout(()=>$("#profMsg").textContent="",2000)});
+$("#exportBtn").onclick=async()=>{const txt=JSON.stringify(S);try{await navigator.clipboard.writeText(txt);toast("Sauvegarde copiée dans le presse-papiers")}catch(e){modal(`<h3>Ta sauvegarde</h3><p class="small muted" style="margin:6px 0 10px">Sélectionne et copie ce texte.</p><textarea rows="8" readonly onclick="this.select()">${esc(txt)}</textarea><div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" data-close>Fermer</button></div>`)}};
+$("#importBtn").onclick=()=>modal(`<h2 class="display" style="margin:0 0 10px">Importer une sauvegarde</h2><form class="grid" style="gap:12px"><textarea name="j" rows="8" required placeholder="Colle ici ta sauvegarde…"></textarea><div class="row" style="justify-content:flex-end"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn pri">Importer</button></div></form>`,fd=>{try{S=norm(JSON.parse(fd.get("j")));save();toast("Sauvegarde importée")}catch(e){toast("Sauvegarde invalide");return false}});
+$("#resetBtn").onclick=()=>{modal(`<h3>Tout réinitialiser ?</h3><p class="small muted" style="margin:8px 0 16px">Profil, missions, streamers et watchlist seront effacés.</p><div class="row" style="justify-content:flex-end"><button class="btn ghost" data-close>Annuler</button><button class="btn pri" id="cfr">Réinitialiser</button></div>`);$("#cfr").onclick=()=>{S=DEFAULT();save();$("#modal").classList.remove("on");toast("Données réinitialisées")}};
+
+/* ---------------- LEADERBOARD ---------------- */
+async function pushLeaderboard(){
+  if(!db||!uid)return;const p=S.profile,st=stats(),ref=db.collection("leaderboard").doc(uid);
+  try{
+    if(p.public&&p.pseudo){await ref.set({id:uid,pseudo:p.pseudo.slice(0,24),plat:p.plateforme,perso:p.perso,pct:st.pct,done:st.done,h:+p.heures||0,at:Date.now()})}
+    else if(LB.some(r=>r.id===uid)){await ref.delete()}
+  }catch(e){}
+}
+
+/* ---------------- BOOT ---------------- */
+const local=lsGet();if(local)S=norm(local);
+renderGuide();renderAll();go(location.hash.slice(1)||"accueil");renderCountdown();setInterval(renderCountdown,1000);
+setSave("","Connexion…");
+(async()=>{
+  try{
+    const w=window.claude;if(!w||typeof w.use!=="function")throw 0;
+    const timeout=new Promise(r=>setTimeout(()=>r(null),10000));
+    [db,user]=await Promise.race([Promise.all([w.use("db"),w.use("user")]),timeout.then(()=>[null,null])]);
+    if(!db||!user)throw 0;
+    uid=await user.id();if(!uid)throw 0;
+    myDoc=db.collection("data/users/"+uid).doc("state");
+    const remote=snapData(await myDoc.get());
+    if(remote&&remote.updated&&(!local||remote.updated>=(local.updated||0))){S=norm(remote);lsSet()}
+    else if(local&&local.updated){flush()}
+    setSave("ok","Synchronisé");renderAll();
+    try{db.collection("news").onSnapshot(s=>{DBNEWS=snapDocs(s);renderNews()},()=>{})}catch(e){}
+    try{const s=await db.collection("news").get();DBNEWS=snapDocs(s);renderNews()}catch(e){}
+    try{db.collection("leaderboard").onSnapshot(s=>{LB=snapDocs(s);renderLB()},()=>{})}catch(e){}
+    try{const s=await db.collection("leaderboard").get();LB=snapDocs(s);renderLB()}catch(e){}
+  }catch(e){db=null;setSave("warn","Sauvegarde locale");renderLB()}
+})();
+})();
+</script>
+</body>
+</html>
