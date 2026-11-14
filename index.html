@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --bg:#0a0614; --bg2:#120b22; --card:#170e2b; --card2:#1e1336; --line:#2e2150;
@@ -155,6 +156,11 @@ footer li{list-style:none;margin-bottom:4px;break-inside:avoid}
 .strm{display:flex;align-items:center;gap:12px}
 .av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#160a1c;flex:none}
 .plat{display:flex;gap:14px;align-items:center}
+.player{width:100%;aspect-ratio:16/9;border:0;border-radius:12px;background:#000;display:block}
+.chatf{width:100%;height:100%;min-height:420px;border:0;border-radius:12px;background:#0e0e10}
+.pl-grid{display:grid;grid-template-columns:1fr 340px;gap:14px}
+@media(max-width:900px){.pl-grid{grid-template-columns:1fr}.chatf{min-height:360px}}
+.authbtn{white-space:nowrap}
 .plat .ic{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-weight:900;font-size:20px;flex:none}
 </style>
 </head>
@@ -172,6 +178,7 @@ footer li{list-style:none;margin-bottom:4px;break-inside:avoid}
       <button class="tab" data-go="classement">Classement</button>
       <button class="tab" data-go="guide">Guide &amp; infos</button>
     </nav>
+    <button class="btn sm authbtn" id="authBtn" style="display:none">Se connecter</button>
     <div class="savepill" id="savepill"><i class="dot" id="savedot"></i><span id="savetxt">Connexion…</span></div>
   </div>
 </header>
@@ -257,19 +264,29 @@ footer li{list-style:none;margin-bottom:4px;break-inside:avoid}
   <h2 class="display">Lives par langue</h2>
   <div class="row" id="langLinks"></div>
 
+  <div id="twitchPlayerWrap" style="display:none">
+    <h2 class="display">Lecteur Twitch intégré</h2>
+    <div class="row" style="margin-bottom:12px"><input id="twCh" placeholder="Nom d'une chaîne Twitch (ex. une de tes favorites)" style="flex:1;min-width:200px"><button class="btn pri sm" id="twGo">▶ Regarder</button><label class="row small muted" style="gap:6px;cursor:pointer"><input type="checkbox" id="twChat" checked style="width:auto"> Chat</label></div>
+    <div id="twBox"><div class="empty">Choisis une chaîne Twitch (ou clique « Regarder ici » sur un favori) pour lancer le live directement sur VICE HUB.</div></div>
+  </div>
   <div class="row" style="justify-content:space-between;align-items:end;margin-top:34px">
     <h2 class="display" style="margin:0">Mes streamers favoris</h2>
     <button class="btn pri sm" id="addStreamerBtn">+ Ajouter un streamer</button>
   </div>
   <p class="small muted" style="margin:6px 0 14px">Ajoute les chaînes que tu suis. Un clic ouvre leur chaîne : s'ils sont en live sur GTA VI, tu tombes directement dessus.</p>
   <div class="grid g3" id="streamerList"></div>
-  <div class="notice" style="margin-top:16px">Le statut « en ligne / hors ligne » ne peut pas être lu depuis cette page (les plateformes ne l'autorisent pas ici) : l'ouverture se fait directement sur Twitch, YouTube, Kick ou TikTok.</div>
+  <div class="notice" style="margin-top:16px" id="streamNotice">Le statut « en ligne / hors ligne » des chaînes n'est pas affiché : un clic ouvre la chaîne, et si elle est en live sur GTA VI tu tombes directement dessus.</div>
 </section>
 
 <!-- VIDEOS -->
 <section class="view" id="v-videos">
   <h1 class="page display">Vidéos incontournables</h1>
   <p class="sub">Toutes les vidéos officielles de Rockstar, des raccourcis vers les meilleures analyses et guides, et ta propre watchlist.</p>
+  <div id="vidPlayerWrap" style="display:none;margin-bottom:10px">
+    <h2 class="display" style="margin-top:0">Lecteur</h2>
+    <div class="row" style="margin-bottom:12px"><input id="vidUrl" placeholder="Colle un lien YouTube ou Twitch (vidéo, live, clip)…" style="flex:1;min-width:220px"><button class="btn pri sm" id="vidGo">▶ Lire ici</button></div>
+    <div id="vidBox"></div>
+  </div>
   <h2 class="display" style="margin-top:0">Officielles Rockstar</h2>
   <div class="grid g4" id="officialVids"></div>
 
@@ -385,6 +402,15 @@ footer li{list-style:none;margin-bottom:4px;break-inside:avoid}
 <script>
 (function(){
 "use strict";
+/* ============ CONFIGURATION (version GitHub) ============
+   Colle ici l'URL et la clé "anon public" de ton projet Supabase
+   (Supabase → Project Settings → API). La clé anon est publique :
+   la sécurité est assurée par les règles RLS de supabase/schema.sql. */
+const CFG = { supabaseUrl: "", supabaseAnonKey: "" };
+/* ======================================================== */
+const IN_CLAUDE = !!(window.claude && typeof window.claude.use==="function") || /claude|anthropic/i.test(location.hostname);
+const EMBED_OK = !IN_CLAUDE && /^https?:$/.test(location.protocol);
+const HOST = location.hostname;
 /* ---------------- DATA ---------------- */
 const RELEASE = new Date(2026,10,19,0,0,0); // minuit heure locale
 const SRC = {
@@ -470,7 +496,7 @@ const FAQ = [
 const DEFAULT = ()=>({v:1,profile:{pseudo:"",plateforme:"PS5",edition:"Standard",perso:"Lucia",heures:"",argent:"",style:"Histoire d'abord",debut:"",bio:"",public:false},
   missions:[],regions:{},launch:{},streamers:[],videos:[],updated:0});
 let S = DEFAULT();
-let db=null, user=null, uid=null, myDoc=null, mode="init";
+let db=null, user=null, uid=null, myDoc=null, backend="init", sb=null, sbEmail="";
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const uidGen=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
@@ -487,11 +513,16 @@ function snapDocs(s){if(!s)return[];const arr=Array.isArray(s)?s:(s.docs||[]);re
 
 let saveTimer=null,saving=false,dirty=false;
 function save(){S.updated=Date.now();lsSet();renderAll();clearTimeout(saveTimer);saveTimer=setTimeout(flush,700)}
+function canRemote(){return (backend==="claude"&&myDoc)||(backend==="supabase"&&uid)}
+async function remoteWrite(){
+  const snap=JSON.parse(JSON.stringify(S));
+  if(backend==="claude"){await myDoc.set(snap);return}
+  const {error}=await sb.from("player_state").upsert({user_id:uid,state:snap,updated_at:new Date().toISOString()});if(error)throw error}
 async function flush(){
-  if(!myDoc){setSave("warn","Sauvegarde locale");return}
+  if(!canRemote()){setSave("warn",backend==="supabase"?"Non connecté · sauvegarde locale":"Sauvegarde locale");return}
   if(saving){dirty=true;return}
   saving=true;setSave("","Sauvegarde…");
-  try{await myDoc.set(JSON.parse(JSON.stringify(S)));setSave("ok","Sauvegardé");await pushLeaderboard()}
+  try{await remoteWrite();setSave("ok","Sauvegardé en ligne");await pushLeaderboard()}
   catch(e){setSave("warn","Sauvegarde locale")}
   saving=false;if(dirty){dirty=false;flush()}
 }
@@ -556,8 +587,25 @@ function renderStreams(){
   $("#langLinks").innerHTML=LANGS.map(([l,u])=>`<a class="btn sm" href="${u}" target="_blank" rel="noopener">${l}</a>`).join("");
   const L=$("#streamerList");
   if(!S.streamers.length){L.innerHTML=`<div class="empty" style="grid-column:1/-1">Aucun streamer pour l'instant. Ajoute ceux que tu suis pour les retrouver en un clic.</div>`;return}
-  L.innerHTML=S.streamers.map(x=>`<div class="card"><div class="strm"><div class="av" style="background:${PCOL[x.p]||"#fff"}">${esc((x.h.replace(/^@/,"")[0]||"?").toUpperCase())}</div><div style="flex:1;min-width:0"><h3 style="overflow:hidden;text-overflow:ellipsis">${esc(x.h)}</h3><div class="small muted">${esc(x.p)}${x.note?" · "+esc(x.note):""}</div></div></div><div class="row" style="margin-top:12px"><a class="btn sm pri" href="${streamerUrl(x)}" target="_blank" rel="noopener">Ouvrir la chaîne</a><button class="btn sm ghost danger" data-delstr="${x.id}">Retirer</button></div></div>`).join("");
+  L.innerHTML=S.streamers.map(x=>`<div class="card"><div class="strm"><div class="av" style="background:${PCOL[x.p]||"#fff"}">${esc((x.h.replace(/^@/,"")[0]||"?").toUpperCase())}</div><div style="flex:1;min-width:0"><h3 style="overflow:hidden;text-overflow:ellipsis">${esc(x.h)}</h3><div class="small muted">${esc(x.p)}${x.note?" · "+esc(x.note):""}</div></div></div><div class="row" style="margin-top:12px">${EMBED_OK&&x.p==="Twitch"?`<button class="btn sm pri" data-tw="${esc(x.h.replace(/^@/,""))}">▶ Regarder ici</button><a class="btn sm" href="${streamerUrl(x)}" target="_blank" rel="noopener">Ouvrir ↗</a>`:`<a class="btn sm pri" href="${streamerUrl(x)}" target="_blank" rel="noopener">Ouvrir la chaîne</a>`}<button class="btn sm ghost danger" data-delstr="${x.id}">Retirer</button></div></div>`).join("");
 }
+function parseVideo(u){
+  let x;try{x=new URL(u)}catch(e){return null}
+  const h=x.hostname.replace(/^www\.|^m\./,""),p=x.pathname.split("/").filter(Boolean);
+  if(h==="youtu.be"&&p[0])return {k:"yt",id:p[0]};
+  if(/youtube\.com$/.test(h)){if(x.searchParams.get("v"))return {k:"yt",id:x.searchParams.get("v")};if(["shorts","live","embed"].includes(p[0])&&p[1])return {k:"yt",id:p[1]}}
+  if(h==="clips.twitch.tv"&&p[0])return {k:"twclip",id:p[0]};
+  if(/twitch\.tv$/.test(h)){if(p[0]==="videos"&&p[1])return {k:"twvod",id:p[1]};if(p[1]==="clip"&&p[2])return {k:"twclip",id:p[2]};if(p[0]&&!["directory","search","settings"].includes(p[0]))return {k:"twch",id:p[0]}}
+  return null}
+function embedSrc(v){if(!v)return null;const id=encodeURIComponent(v.id),par="parent="+encodeURIComponent(HOST);
+  return v.k==="yt"?`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`:v.k==="twch"?`https://player.twitch.tv/?channel=${id}&${par}`:v.k==="twvod"?`https://player.twitch.tv/?video=v${id}&${par}`:v.k==="twclip"?`https://clips.twitch.tv/embed?clip=${id}&${par}`:null}
+function playVideo(u){const v=parseVideo(u),src=embedSrc(v);if(!EMBED_OK||!src){toast("Lien non reconnu (YouTube ou Twitch)");return}
+  $("#vidBox").innerHTML=`<iframe class="player" src="${esc(src)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe><div class="small muted" style="margin-top:6px"><a href="${esc(u)}" target="_blank" rel="noopener">Ouvrir sur la plateforme ↗</a></div>`;
+  $("#vidPlayerWrap").scrollIntoView({behavior:"smooth",block:"start"})}
+function playTwitch(ch){ch=String(ch||"").trim().replace(/^@/,"").replace(/^https?:\/\/(www\.)?twitch\.tv\//i,"").split(/[/?#]/)[0];if(!/^[a-zA-Z0-9_]{2,30}$/.test(ch)){toast("Nom de chaîne Twitch invalide");return}
+  $("#twCh").value=ch;const par="parent="+encodeURIComponent(HOST),chat=$("#twChat").checked;
+  $("#twBox").innerHTML=`<div class="${chat?"pl-grid":""}"><iframe class="player" src="https://player.twitch.tv/?channel=${ch}&${par}" allow="autoplay; fullscreen" allowfullscreen></iframe>${chat?`<iframe class="chatf" src="https://www.twitch.tv/embed/${ch}/chat?${par}&darkpopout"></iframe>`:""}</div>`;
+  $("#twitchPlayerWrap").scrollIntoView({behavior:"smooth",block:"start"})}
 function ytSearch(q,channel){return channel?`https://www.youtube.com/@RockstarGames/search?query=${encodeURIComponent(q)}`:`https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`}
 function renderVideos(){
   const play='<svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>';
@@ -566,7 +614,7 @@ function renderVideos(){
   $("#topicVids").innerHTML=TOPICS.map((v,i)=>`<a class="card hov" href="${ytSearch(v.q)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;padding:12px"><div class="vthumb" style="background:linear-gradient(135deg,${cols[i%4]}55,#170e2b);border:1px solid var(--line)"><div class="play">${play}</div></div><span class="tag t">${esc(v.tag)}</span><h3 style="margin-top:6px">${esc(v.t)}</h3><div class="small muted">Les vidéos les plus récentes ↗</div></a>`).join("");
   const W=$("#watchList");
   if(!S.videos.length){W.innerHTML=`<div class="empty">Ta watchlist est vide. Ajoute les vidéos que tu ne veux pas rater.</div>`;return}
-  W.innerHTML=S.videos.map(v=>`<div class="mrow ${v.seen?"done":""}"><button class="chk ${v.seen?"s2":""}" data-seen="${v.id}" title="Marquer comme vue">${v.seen?"✓":""}</button><div style="min-width:0"><div class="mt" style="overflow:hidden;text-overflow:ellipsis">${esc(v.t||v.u)}</div><div class="meta"><a class="small" href="${esc(v.u)}" target="_blank" rel="noopener">Ouvrir ↗</a></div></div><button class="btn sm ghost danger" data-delvid="${v.id}">✕</button></div>`).join("");
+  W.innerHTML=S.videos.map(v=>`<div class="mrow ${v.seen?"done":""}"><button class="chk ${v.seen?"s2":""}" data-seen="${v.id}" title="Marquer comme vue">${v.seen?"✓":""}</button><div style="min-width:0"><div class="mt" style="overflow:hidden;text-overflow:ellipsis">${esc(v.t||v.u)}</div><div class="meta">${EMBED_OK&&parseVideo(v.u)?`<button class="btn sm pri" data-play="${esc(v.u)}" style="padding:3px 10px">▶ Lire ici</button>`:""}<a class="small" href="${esc(safeUrl(v.u))}" target="_blank" rel="noopener">Ouvrir ↗</a></div></div><button class="btn sm ghost danger" data-delvid="${v.id}">✕</button></div>`).join("");
 }
 function renderProfile(){
   const p=S.profile,st=stats(),f=$("#profileForm");
@@ -620,10 +668,11 @@ function renderMissions(){
 let LB=[];
 function renderLB(){
   const B=$("#lbBox");
-  if(!db){B.innerHTML=`<div class="empty">Le classement s'affiche quand tu es connecté à ton compte Claude.</div>`;return}
-  if(!LB.length){B.innerHTML=`<div class="empty">Personne dans le classement pour l'instant. Rends ton profil public dans « Mon profil » pour ouvrir le bal !</div>`;return}
+  if(backend==="local"){B.innerHTML=`<div class="empty">Le classement communauté n'est pas disponible sur cette version du site.</div>`;return}
+  const joinMsg=backend==="supabase"&&!uid?`<div class="notice t" style="margin-bottom:14px">Connecte-toi (bouton en haut) puis rends ton profil public pour apparaître dans le classement.</div>`:"";
+  if(!LB.length){B.innerHTML=joinMsg+`<div class="empty">Personne dans le classement pour l'instant. Rends ton profil public dans « Mon profil » pour ouvrir le bal !</div>`;return}
   const rows=[...LB].sort((a,b)=>(b.pct||0)-(a.pct||0)||(b.done||0)-(a.done||0)||(b.h||0)-(a.h||0));
-  B.innerHTML=`<table><thead><tr><th>#</th><th>Joueur</th><th>Plateforme</th><th>Progression</th><th>Missions</th><th>Heures</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${r.id===uid?"me":""}"><td class="rank" style="color:${i===0?"var(--yellow)":i===1?"#d6d6e6":i===2?"var(--orange)":"var(--mut)"}">${i+1}</td><td><b>${esc(r.pseudo||"Anonyme")}</b>${r.id===uid?' <span class="tag">toi</span>':""}<div class="small muted">Team ${esc(r.perso||"?")}</div></td><td class="small">${esc(r.plat||"")}</td><td style="min-width:140px"><div class="small">${r.pct||0} %</div><div class="bar" style="height:6px"><i style="width:${r.pct||0}%"></i></div></td><td>${r.done||0}</td><td>${(r.h||0).toLocaleString("fr-FR")} h</td></tr>`).join("")}</tbody></table>`;
+  B.innerHTML=joinMsg+`<table><thead><tr><th>#</th><th>Joueur</th><th>Plateforme</th><th>Progression</th><th>Missions</th><th>Heures</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${r.id===uid?"me":""}"><td class="rank" style="color:${i===0?"var(--yellow)":i===1?"#d6d6e6":i===2?"var(--orange)":"var(--mut)"}">${i+1}</td><td><b>${esc(r.pseudo||"Anonyme")}</b>${r.id===uid?' <span class="tag">toi</span>':""}<div class="small muted">Team ${esc(r.perso||"?")}</div></td><td class="small">${esc(r.plat||"")}</td><td style="min-width:140px"><div class="small">${r.pct||0} %</div><div class="bar" style="height:6px"><i style="width:${r.pct||0}%"></i></div></td><td>${r.done||0}</td><td>${(r.h||0).toLocaleString("fr-FR")} h</td></tr>`).join("")}</tbody></table>`;
 }
 function renderGuide(){
   $("#factTable").innerHTML=FACTS.map(([k,v])=>`<tr><td class="muted small" style="width:42%">${esc(k)}</td><td style="font-weight:600">${esc(v)}</td></tr>`).join("");
@@ -632,11 +681,11 @@ function renderGuide(){
   $("#faq").innerHTML=FAQ.map(([q,a])=>`<div class="card"><h3 style="margin-bottom:6px">${esc(q)}</h3><p class="small muted">${esc(a)}</p></div>`).join("");
   const seen=new Set();$("#sources").innerHTML=Object.values(SRC).filter(s=>!seen.has(s.u)&&seen.add(s.u)).map(s=>`<li><a href="${s.u}" target="_blank" rel="noopener">${esc(s.n)}</a></li>`).join("");
 }
-function renderAll(){renderNews();renderStreams();renderVideos();renderProfile();renderMissions();renderLB()}
+function renderAll(){if(typeof renderAuth==="function")renderAuth();renderNews();renderStreams();renderVideos();renderProfile();renderMissions();renderLB()}
 
 /* ---------------- ROUTING ---------------- */
 const VIEWS=["accueil","actus","streams","videos","profil","missions","classement","guide"];
-function go(v){if(!VIEWS.includes(v))v="accueil";$$("section.view").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));$$(".tab").forEach(t=>t.classList.toggle("on",t.dataset.go===v));if(location.hash!=="#"+v){try{history.replaceState(null,"","#"+v)}catch(e){location.hash=v}}window.scrollTo({top:0,behavior:"smooth"})}
+function go(v){const authHash=/access_token|error_description/.test(location.hash);if(!VIEWS.includes(v))v="accueil";$$("section.view").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));$$(".tab").forEach(t=>t.classList.toggle("on",t.dataset.go===v));if(!authHash&&location.hash!=="#"+v){try{history.replaceState(null,"","#"+v)}catch(e){location.hash=v}}window.scrollTo({top:0,behavior:"smooth"})}
 window.addEventListener("hashchange",()=>go(location.hash.slice(1)));
 
 /* ---------------- MODALS ---------------- */
@@ -666,9 +715,11 @@ function missionModal(m){
 
 /* ---------------- EVENTS ---------------- */
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-go],[data-nc],[data-mc],[data-cyc],[data-edm],[data-delm],[data-reg],[data-lch],[data-delstr],[data-seen],[data-delvid],[data-add-m]");
+  const t=e.target.closest("[data-tw],[data-play],[data-go],[data-nc],[data-mc],[data-cyc],[data-edm],[data-delm],[data-reg],[data-lch],[data-delstr],[data-seen],[data-delvid],[data-add-m]");
   if(!t)return;const d=t.dataset;
-  if(d.go){e.preventDefault();go(d.go)}
+  if(d.tw){playTwitch(d.tw)}
+  else if(d.play){playVideo(d.play)}
+  else if(d.go){e.preventDefault();go(d.go)}
   else if(d.nc){newsCat=d.nc;renderNews()}
   else if(d.mc){mCat=d.mc;renderMissions()}
   else if(d.cyc){const m=S.missions.find(x=>x.id===d.cyc);if(m){m.s=(m.s+1)%3;save();if(m.s===2)toast("Mission terminée 🎉")}}
@@ -701,24 +752,61 @@ $("#resetBtn").onclick=()=>{modal(`<h3>Tout réinitialiser ?</h3><p class="small
 
 /* ---------------- LEADERBOARD ---------------- */
 async function pushLeaderboard(){
-  if(!db||!uid)return;const p=S.profile,st=stats(),ref=db.collection("leaderboard").doc(uid);
+  if(!uid)return;const p=S.profile,st=stats(),pub=p.public&&p.pseudo,h=Math.min(99999,Math.max(0,+p.heures||0));
   try{
-    if(p.public&&p.pseudo){await ref.set({id:uid,pseudo:p.pseudo.slice(0,24),plat:p.plateforme,perso:p.perso,pct:st.pct,done:st.done,h:+p.heures||0,at:Date.now()})}
-    else if(LB.some(r=>r.id===uid)){await ref.delete()}
+    if(backend==="claude"){const ref=db.collection("leaderboard").doc(uid);
+      if(pub)await ref.set({id:uid,pseudo:p.pseudo.slice(0,24),plat:p.plateforme,perso:p.perso,pct:st.pct,done:st.done,h,at:Date.now()});
+      else if(LB.some(r=>r.id===uid))await ref.delete()}
+    else if(backend==="supabase"){
+      if(pub)await sb.from("leaderboard").upsert({user_id:uid,pseudo:p.pseudo.slice(0,24),plat:p.plateforme,perso:p.perso,pct:st.pct,done:st.done,h,updated_at:new Date().toISOString()});
+      else if(LB.some(r=>r.id===uid))await sb.from("leaderboard").delete().eq("user_id",uid);
+      fetchLB()}
   }catch(e){}
+}
+async function fetchLB(){if(backend!=="supabase")return;try{const {data,error}=await sb.from("leaderboard").select("user_id,pseudo,plat,perso,pct,done,h").order("pct",{ascending:false}).limit(200);if(!error){LB=(data||[]).map(r=>({id:r.user_id,...r,h:+r.h||0}));renderLB()}}catch(e){}}
+async function fetchNewsJson(){try{const r=await fetch("news.json",{cache:"no-store"});if(!r.ok)return;const j=await r.json();if(Array.isArray(j)){DBNEWS=j;renderNews()}}catch(e){}}
+function renderAuth(){const b=$("#authBtn");if(backend!=="supabase"){b.style.display="none";return}b.style.display="";b.textContent=uid?("👤 "+(S.profile.pseudo||"Mon compte")):"Se connecter"}
+function authModal(){
+  if(uid){modal(`<h2 class="display" style="margin:0 0 8px">Mon compte</h2><p class="small muted">Connecté avec <b>${esc(sbEmail)}</b>. Ton profil et tes missions sont sauvegardés en ligne et synchronisés sur tous tes appareils.</p><div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn ghost" data-close>Fermer</button><button class="btn danger" id="sbOut">Se déconnecter</button></div>`);
+    $("#sbOut").onclick=async()=>{try{await sb.auth.signOut()}catch(e){}uid=null;sbEmail="";$("#modal").classList.remove("on");renderAuth();renderLB();setSave("warn","Non connecté · sauvegarde locale");toast("Déconnecté")};return}
+  modal(`<h2 class="display" style="margin:0 0 8px">Connexion</h2><p class="small muted" style="margin-bottom:14px">Reçois un lien de connexion par e-mail (pas de mot de passe). Ton profil et tes missions seront sauvegardés en ligne et suivront sur tous tes appareils.</p>
+   <form class="grid" style="gap:12px"><div><label class="f">Adresse e-mail</label><input name="email" type="email" required placeholder="toi@exemple.fr"></div><div class="row" style="justify-content:flex-end"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn pri">Recevoir le lien</button></div><p class="small" id="authMsg"></p></form>`,fd=>{
+    const email=String(fd.get("email")||"").trim();
+    sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}}).then(({error})=>{const m=$("#authMsg");if(m)m.textContent=error?("Erreur : "+error.message):"C'est parti ! Ouvre le lien reçu par e-mail dans ce navigateur.";if(error)toast("Envoi impossible");else toast("Lien envoyé, vérifie tes e-mails")});
+    return false})}
+async function sbSession(session){
+  const prev=uid;uid=session&&session.user?session.user.id:null;sbEmail=session&&session.user?session.user.email||"":"";renderAuth();
+  if(!uid){setSave("warn","Non connecté · sauvegarde locale");renderLB();return}
+  if(prev===uid)return;
+  setSave("","Synchronisation…");
+  try{const {data,error}=await sb.from("player_state").select("state,updated_at").eq("user_id",uid).maybeSingle();if(error)throw error;
+    const remote=data&&data.state;
+    if(remote&&remote.updated&&remote.updated>=(S.updated||0)){S=norm(remote);lsSet();renderAll()}else{await flush()}
+    setSave("ok","Synchronisé");renderAuth();fetchLB()}catch(e){setSave("warn","Erreur de synchro · local")}
 }
 
 /* ---------------- BOOT ---------------- */
 const local=lsGet();if(local)S=norm(local);
 renderGuide();renderAll();go(location.hash.slice(1)||"accueil");renderCountdown();setInterval(renderCountdown,1000);
 setSave("","Connexion…");
+$("#authBtn").onclick=authModal;
+if(EMBED_OK){$("#twitchPlayerWrap").style.display="";$("#vidPlayerWrap").style.display="";$("#twGo").onclick=()=>playTwitch($("#twCh").value);$("#twCh").onkeydown=e=>{if(e.key==="Enter")playTwitch($("#twCh").value)};$("#vidGo").onclick=()=>playVideo($("#vidUrl").value.trim());$("#vidUrl").onkeydown=e=>{if(e.key==="Enter")playVideo($("#vidUrl").value.trim())};$("#vidBox").innerHTML='<div class="empty">Colle un lien YouTube ou Twitch, ou clique « Lire ici » dans ta watchlist.</div>'}
+async function bootSupabase(){
+  if(!CFG.supabaseUrl||!CFG.supabaseAnonKey||!window.supabase){backend="local";setSave("warn","Sauvegarde locale");renderLB();return}
+  try{sb=window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey,{auth:{flowType:"pkce",persistSession:true,detectSessionInUrl:true}})}catch(e){backend="local";setSave("warn","Sauvegarde locale");return}
+  backend="supabase";renderAuth();renderLB();fetchLB();setInterval(fetchLB,60000);
+  sb.auth.onAuthStateChange((ev,session)=>{setTimeout(()=>sbSession(session),0)});
+  try{const {data}=await sb.auth.getSession();await sbSession(data&&data.session)}catch(e){sbSession(null)}
+  if(/[?&]code=/.test(location.search)){try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}}
+}
+if(!IN_CLAUDE){fetchNewsJson();setInterval(fetchNewsJson,600000)}
 (async()=>{
   try{
     const w=window.claude;if(!w||typeof w.use!=="function")throw 0;
     const timeout=new Promise(r=>setTimeout(()=>r(null),10000));
     [db,user]=await Promise.race([Promise.all([w.use("db"),w.use("user")]),timeout.then(()=>[null,null])]);
     if(!db||!user)throw 0;
-    uid=await user.id();if(!uid)throw 0;
+    uid=await user.id();if(!uid)throw 0;backend="claude";
     myDoc=db.collection("data/users/"+uid).doc("state");
     const remote=snapData(await myDoc.get());
     if(remote&&remote.updated&&(!local||remote.updated>=(local.updated||0))){S=norm(remote);lsSet()}
@@ -728,7 +816,7 @@ setSave("","Connexion…");
     try{const s=await db.collection("news").get();DBNEWS=snapDocs(s);renderNews()}catch(e){}
     try{db.collection("leaderboard").onSnapshot(s=>{LB=snapDocs(s);renderLB()},()=>{})}catch(e){}
     try{const s=await db.collection("leaderboard").get();LB=snapDocs(s);renderLB()}catch(e){}
-  }catch(e){db=null;setSave("warn","Sauvegarde locale");renderLB()}
+  }catch(e){db=null;uid=null;await bootSupabase()}
 })();
 })();
 </script>
