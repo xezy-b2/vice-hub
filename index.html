@@ -176,6 +176,30 @@ footer li{list-style:none;margin-bottom:4px;break-inside:avoid}
 .sep{display:flex;align-items:center;gap:10px;color:var(--mut);font-size:12px;margin:16px 0}.sep:before,.sep:after{content:"";flex:1;height:1px;background:var(--line)}
 .avpick{display:flex;gap:6px;flex-wrap:wrap}.avpick button{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);font-size:20px;cursor:pointer}.avpick button.on{border-color:var(--pink);background:rgba(255,61,139,.15)}
 .cpick{display:flex;gap:6px}.cpick button{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer}.cpick button.on{border-color:#fff}
+.spoil{position:relative;cursor:pointer;border-radius:10px}
+.spoil .blur{filter:blur(7px);user-select:none;pointer-events:none;opacity:.7}
+.spoil-lab{position:absolute;inset:0;display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--txt);text-shadow:0 1px 6px #000}
+.livecard{display:block;color:inherit;text-decoration:none;padding:0;overflow:hidden;cursor:pointer}
+.livecard .th{aspect-ratio:16/9;background:#000 center/cover no-repeat;position:relative}
+.livecard .th .lv{position:absolute;left:8px;top:8px;background:#ff2e4d;color:#fff;font-size:11px;font-weight:800;padding:2px 7px;border-radius:5px}
+.livecard .th .vw{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.75);font-size:12px;padding:2px 7px;border-radius:5px}
+.livecard .bd{padding:10px 12px}
+.livebadge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#ff6b81}
+.mapwrap{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:radial-gradient(circle at 60% 40%,#123a5a,#081a2c 70%)}
+.mapwrap svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.reg{cursor:pointer;transition:fill .2s,opacity .2s;stroke:#0a0614;stroke-width:3}
+.reg:hover{opacity:.85}
+.reg.sel{stroke:#fff;stroke-width:4}
+.maplbl{font-family:"Bebas Neue";font-size:22px;fill:#fff;pointer-events:none;text-anchor:middle;paint-order:stroke;stroke:#0a0614;stroke-width:4px;letter-spacing:.04em}
+.pin{cursor:pointer}.pin text{font-size:22px;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.mapwrap.pinmode svg{cursor:crosshair}
+.post{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:16px 0;border-bottom:1px solid var(--line)}
+.post:last-child{border-bottom:none}
+.post .body{white-space:pre-wrap;word-break:break-word;margin-top:4px}
+.post img.shot{max-width:100%;max-height:520px;border-radius:12px;margin-top:10px;display:block;border:1px solid var(--line);cursor:zoom-in}
+.likebtn.on{border-color:var(--pink);color:var(--pink)}
+.offrow{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.offrow:last-child{border-bottom:none}
 tr.clk{cursor:pointer}tr.clk:hover td{background:rgba(255,255,255,.03)}
 .plat .ic{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-weight:900;font-size:20px;flex:none}
 </style>
@@ -190,8 +214,10 @@ tr.clk{cursor:pointer}tr.clk:hover td{background:rgba(255,255,255,.03)}
       <button class="tab" data-go="streams">Streams</button>
       <button class="tab" data-go="videos">Vidéos</button>
       <button class="tab" data-go="missions">Missions</button>
+      <button class="tab" data-go="carte">Carte</button>
+      <button class="tab" data-go="communaute">Communauté</button>
       <button class="tab" data-go="classement">Classement</button>
-      <button class="tab" data-go="guide">Guide &amp; infos</button>
+      <button class="tab" data-go="guide">Guide</button>
       <button class="tab" data-go="compte" id="tabCompte">Mon compte</button>
     </nav>
     <button class="btn sm authbtn" id="authBtn" style="display:none">Se connecter</button>
@@ -266,7 +292,7 @@ tr.clk{cursor:pointer}tr.clk:hover td{background:rgba(255,255,255,.03)}
   <h1 class="page display">Actualités GTA VI</h1>
   <p class="sub">Les infos vérifiées sur GTA VI, ajoutées automatiquement toutes les heures. Chaque brève renvoie vers sa source.</p>
   <p class="small muted" id="newsUpd" style="margin:-12px 0 16px;display:flex;gap:8px;align-items:center"></p>
-  <div class="filters" id="newsFilters"></div>
+  <div class="row" style="justify-content:space-between;margin-bottom:14px"><div class="filters" id="newsFilters" style="margin:0"></div><button class="chip nospoil" data-nospoil></button></div>
   <div class="card" id="newsList"></div>
   <div class="notice t" style="margin-top:16px">Pour suivre aussi l'actu en temps réel : <a href="https://www.rockstargames.com/newswire" target="_blank" rel="noopener">Rockstar Newswire</a> · <a href="https://www.rockstargames.com/VI" target="_blank" rel="noopener">site officiel GTA VI</a>.</div>
 </section>
@@ -275,6 +301,10 @@ tr.clk{cursor:pointer}tr.clk:hover td{background:rgba(255,255,255,.03)}
 <section class="view" id="v-streams">
   <h1 class="page display">Streams en direct</h1>
   <p class="sub">Accès direct aux lives GTA VI sur chaque plateforme, plus ta liste de streamers favoris. Chaque lien ouvre la plateforme dans un nouvel onglet.</p>
+  <div id="liveSection" style="display:none;margin-bottom:26px">
+    <div class="row" style="justify-content:space-between;align-items:end"><h2 class="display" style="margin:0 0 10px">🔴 En direct sur GTA VI</h2><div class="filters" id="liveLang" style="margin:0 0 10px"></div></div>
+    <div class="grid g4" id="liveGrid"></div>
+  </div>
   <div class="grid g4" id="platGrid"></div>
 
   <h2 class="display">Lives par langue</h2>
@@ -291,7 +321,7 @@ tr.clk{cursor:pointer}tr.clk:hover td{background:rgba(255,255,255,.03)}
   </div>
   <p class="small muted" style="margin:6px 0 14px">Ajoute les chaînes que tu suis. Un clic ouvre leur chaîne : s'ils sont en live sur GTA VI, tu tombes directement dessus.</p>
   <div class="grid g3" id="streamerList"></div>
-  <div class="notice" style="margin-top:16px" id="streamNotice">Le statut « en ligne / hors ligne » des chaînes n'est pas affiché : un clic ouvre la chaîne, et si elle est en live sur GTA VI tu tombes directement dessus.</div>
+  <div class="notice" style="margin-top:16px;display:none" id="streamNotice">Le statut « en ligne / hors ligne » des chaînes n'est pas affiché : un clic ouvre la chaîne, et si elle est en live sur GTA VI tu tombes directement dessus.</div>
 </section>
 
 <!-- VIDEOS -->
@@ -322,8 +352,10 @@ tr.clk{cursor:pointer}tr.clk:hover td{background:rgba(255,255,255,.03)}
   <h1 class="page display">Suivi des missions</h1>
   <p class="sub">Ton carnet de route : missions d'histoire, braquages, activités, collectibles et défis perso. Ajoute-les au fil de ta partie et suis ta progression.</p>
   <div class="grid g4" id="mStats"></div>
+  <div class="card" style="margin-top:18px" id="offBox"></div>
   <div class="grid g2" style="grid-template-columns:1.6fr 1fr;margin-top:18px;align-items:start">
     <div>
+      <h3 style="margin-bottom:10px">Mes missions perso</h3>
       <div class="row" style="justify-content:space-between;margin-bottom:12px">
         <div class="filters" id="mFilters" style="margin:0"></div>
         <button class="btn pri sm" id="addMissionBtn">+ Nouvelle mission</button>
@@ -335,6 +367,41 @@ tr.clk{cursor:pointer}tr.clk:hover td{background:rgba(255,255,255,.03)}
       <div class="card"><h3>Exploration de Leonida</h3><p class="small muted" style="margin:4px 0 8px">Les régions dévoilées par Rockstar.</p><ul class="cl" id="clRegions"></ul></div>
       <div class="card"><h3>Checklist jour J</h3><p class="small muted" style="margin:4px 0 8px">Pour être prêt à minuit.</p><ul class="cl" id="clLaunch"></ul></div>
       <div class="card"><h3>Par catégorie</h3><div id="catBars" style="margin-top:10px"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CARTE -->
+<section class="view" id="v-carte">
+  <h1 class="page display">Carte de Leonida</h1>
+  <p class="sub">Clique sur une région pour la marquer comme explorée, ou passe en mode épingle pour placer tes propres repères (collectibles, planques, garages…). Tout est sauvegardé dans ton compte.</p>
+  <div class="grid g2" style="grid-template-columns:1.7fr 1fr;align-items:start">
+    <div>
+      <div class="row" style="margin-bottom:10px;justify-content:space-between">
+        <div class="row" style="gap:8px"><button class="btn sm" id="pinModeBtn">📍 Placer une épingle</button><span class="small muted" id="pinHint"></span></div>
+        <div class="filters" id="pinFilters" style="margin:0"></div>
+      </div>
+      <div class="mapwrap" id="mapWrap"></div>
+      <p class="small muted" style="margin-top:8px">Carte schématique non officielle : formes et positions des régions approximatives.</p>
+    </div>
+    <div class="grid" style="gap:16px">
+      <div class="card" id="regPanel"></div>
+      <div class="card"><h3>Mes épingles</h3><div id="pinList" style="margin-top:8px"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMUNAUTÉ -->
+<section class="view" id="v-communaute">
+  <div class="row" style="justify-content:space-between;align-items:end"><div><h1 class="page display">Communauté</h1><p class="sub" style="margin-bottom:14px">Partage tes captures, tes astuces et tes meilleurs moments à Leonida.</p></div><button class="chip nospoil" data-nospoil style="margin-bottom:18px"></button></div>
+  <div class="grid g2" style="grid-template-columns:1.6fr 1fr;align-items:start">
+    <div>
+      <div class="card" id="composer" style="margin-bottom:16px"></div>
+      <div class="card"><div class="row" style="justify-content:space-between"><h3>Fil d'actualité</h3><button class="btn sm ghost" id="feedRefresh">↻ Actualiser</button></div><div id="feed"></div><div style="text-align:center;margin-top:12px"><button class="btn sm" id="feedMore" style="display:none">Charger plus</button></div></div>
+    </div>
+    <div class="grid" style="gap:16px">
+      <div class="card"><h3>Règles</h3><ul class="small muted" style="margin:8px 0 0 18px;display:grid;gap:6px"><li>Reste respectueux, pas d'insultes ni de harcèlement.</li><li>Coche « spoiler » si ton post dévoile l'histoire.</li><li>Pas de pub ni de liens douteux.</li><li>Un contenu gênant ? Utilise « Signaler ».</li></ul></div>
+      <div class="card"><h3>Top joueurs</h3><div id="miniLB" style="margin-top:8px"></div></div>
     </div>
   </div>
 </section>
@@ -452,11 +519,13 @@ const SRC = {
   gamesradar:{n:"GamesRadar+",u:"https://www.gamesradar.com/games/grand-theft-auto/gta-6-delayed-6-more-months-as-rockstar-commits-to-november-2026-and-says-sorry"},
   games:{n:"games.gg",u:"https://games.gg/fr/news/le-pdg-de-take-two-confirme-la-date-de-sortie-de-gta-6-au-19-novembre/"},
   tweaktown:{n:"TweakTown",u:"https://tweaktown.com/hubs/gta-6/index.html"},
+  vgc:{n:"VGC",u:"https://videogameschronicle.com/news/rockstar-confirms-there-will-be-no-disc-version-of-gta6-at-launch/"},
+  arynews:{n:"ARY News",u:"https://arynews.tv/gta-6-will-be-all-digital-for-launch-and-beyond-rockstar-insists-on-code-in-box-version"},
   gamewiki:{n:"The Games Wiki",u:"https://thegameswiki.com/gta6/wiki/trailers/history/d9663e03-66dd-4f6a-92bf-32836fc36cc6"}
 };
 const NEWS = [
   {d:"2026-11-14",c:"Lancement",t:"GTA VI pourrait bousculer le streaming… et les congés",s:"Créateurs, plateformes de streaming, livraison de repas et tourisme à Miami pourraient tous ressentir l'effet du lancement. Près d'un salarié sur cinq (aux États-Unis) prévoit de poser un congé pour l'occasion.",src:"cnbc"},
-  {d:"2026-11-12",c:"Lancement",t:"212 Go, 100 % numérique au lancement",s:"Le jeu occupera 212 Go sur la console. Il sort uniquement en version numérique le 19 novembre ; une édition physique est prévue pour 2027.",src:"newsnation"},
+  {d:"2026-11-12",c:"Lancement",t:"212 Go, et pas de disque au lancement",s:"Le jeu occupera 212 Go sur la console. Les boîtes vendues en magasin contiennent un code de téléchargement plutôt qu'un disque ; une version sur disque est attendue plus tard.",src:"vgc"},
   {d:"2026-11-10",c:"Business",t:"Précommandes « bien au-delà des attentes » selon Take-Two",s:"Strauss Zelnick affirme que les préventes dépassent largement les prévisions, tout en refusant de crier victoire avant la sortie. Prix confirmés : 79,99 $ (Standard) et 99,99 $ (Ultimate).",src:"variety"},
   {d:"2026-11-10",c:"Lancement",t:"Le préchargement est ouvert",s:"Les joueurs ayant précommandé peuvent télécharger le jeu à l'avance depuis le 10 novembre. La précommande inclut le pack Vintage Vice City.",src:"macobs"},
   {d:"2026-11-09",c:"Business",t:"Take-Two réaffirme la date du 19 novembre",s:"Dans son rapport trimestriel, l'éditeur confirme une nouvelle fois le calendrier de sortie sur PS5 et Xbox Series X|S.",src:"macobs"},
@@ -505,14 +574,14 @@ const CATS = ["Histoire","Braquage","Annexe","Activité","Collectible","Défi pe
 const CATCLS = {"Histoire":"","Braquage":"o","Annexe":"t","Activité":"p","Collectible":"g","Défi perso":"o"};
 const FACTS = [
   ["Date de sortie","Jeudi 19 novembre 2026"],["Heure","Minuit, heure locale"],["Plateformes","PS5 · Xbox Series X|S"],["PC","Pas encore annoncé"],
-  ["Prix (US)","79,99 $ Standard · 99,99 $ Ultimate"],["Format","Numérique au lancement · physique en 2027"],["Taille","212 Go"],
+  ["Prix (US)","79,99 $ Standard · 99,99 $ Ultimate"],["Format","Boîte = code de téléchargement (sans disque) · version disque attendue plus tard"],["Taille","212 Go"],
   ["Bonus précommande","Pack Vintage Vice City"],["Cadre","État de Leonida (Floride fictive), Vice City"],["Protagonistes","Lucia Caminos & Jason Duval"],
   ["GTA Online VI","Pas au lancement, attendu en 2027 selon la presse"],["Développeur","Rockstar Games (Take-Two Interactive)"]
 ];
 const FAQ = [
   ["À quelle heure sort GTA VI ?","À minuit heure locale le 19 novembre. En France, ça tombe dans la nuit du mercredi 18 au jeudi 19 novembre."],
   ["Y aura-t-il une version PC ?","Pas au lancement, et Rockstar n'a annoncé aucune date. Historiquement, GTA V est arrivé sur PC 19 mois après la sortie console et Red Dead Redemption 2 après 13 mois."],
-  ["Peut-on acheter une version physique ?","Pas le jour de la sortie : GTA VI sort en numérique uniquement, une version physique étant prévue pour 2027."],
+  ["Peut-on acheter une version physique ?","Oui, mais la boîte vendue au lancement contient un code de téléchargement, pas de disque. Le support de Rockstar indique que des copies avec disque arriveront dans les mois suivant la sortie."],
   ["Combien d'espace faut-il ?","212 Go. Pense à libérer de la place avant de lancer le préchargement."],
   ["GTA Online sera-t-il dispo au lancement ?","Non. Le mode en ligne de GTA VI n'a pas de date ; la presse l'attend plutôt en 2027."],
   ["Où se passe le jeu ?","Dans l'État fictif de Leonida, inspiré de la Floride, avec un retour à Vice City version moderne."]
@@ -520,8 +589,12 @@ const FAQ = [
 
 /* ---------------- STATE ---------------- */
 const DEFAULT = ()=>({v:1,profile:{pseudo:"",plateforme:"PS5",edition:"Standard",perso:"Lucia",heures:"",argent:"",style:"Histoire d'abord",debut:"",bio:"",public:false},
-  missions:[],regions:{},launch:{},streamers:[],videos:[],updated:0});
+  missions:[],regions:{},launch:{},streamers:[],videos:[],official:{},pins:[],settings:{noSpoil:true},updated:0});
 let S = DEFAULT();
+let CATALOG=[], SBNEWS=[], LIVE={configured:false,streams:[]}, LIVEFAV={}, liveLang="", REVEALED=new Set();
+function spoilWrap(key,html,isSpoil){if(!isSpoil||!S.settings.noSpoil||REVEALED.has(key))return html;return `<div class="spoil" data-reveal="${esc(key)}"><div class="blur">${html}</div><span class="spoil-lab">🙈 Spoiler · cliquer pour afficher</span></div>`}
+function renderSpoilBtns(){$$("[data-nospoil]").forEach(b=>{b.textContent="🙈 Sans spoiler : "+(S.settings.noSpoil?"ON":"OFF");b.classList.toggle("on",!!S.settings.noSpoil)})}
+function timeAgo(iso){const s=(Date.now()-new Date(iso))/1000;if(s<60)return "à l'instant";if(s<3600)return "il y a "+Math.floor(s/60)+" min";if(s<86400)return "il y a "+Math.floor(s/3600)+" h";return new Date(iso).toLocaleDateString("fr-FR",{day:"numeric",month:"short"})}
 let db=null, user=null, uid=null, myDoc=null, backend="init", sb=null, sbEmail="";
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -533,7 +606,7 @@ function setSave(kind,txt){$("#savedot").className="dot "+(kind||"");$("#savetxt
 
 function lsGet(){try{const r=localStorage.getItem("vicehub_state");return r?JSON.parse(r):null}catch(e){return null}}
 function lsSet(){try{localStorage.setItem("vicehub_state",JSON.stringify(S))}catch(e){}}
-function norm(x){const d=DEFAULT();if(!x||typeof x!=="object")return d;return {...d,...x,profile:{...d.profile,...(x.profile||{})},missions:Array.isArray(x.missions)?x.missions:[],streamers:Array.isArray(x.streamers)?x.streamers:[],videos:Array.isArray(x.videos)?x.videos:[],regions:x.regions||{},launch:x.launch||{}}}
+function norm(x){const d=DEFAULT();if(!x||typeof x!=="object")return d;return {...d,...x,profile:{...d.profile,...(x.profile||{})},missions:Array.isArray(x.missions)?x.missions:[],streamers:Array.isArray(x.streamers)?x.streamers:[],videos:Array.isArray(x.videos)?x.videos:[],regions:x.regions||{},launch:x.launch||{},official:x.official&&typeof x.official==="object"?x.official:{},pins:Array.isArray(x.pins)?x.pins:[],settings:{...d.settings,...(x.settings||{})}}}
 function snapData(s){if(!s)return null;if(typeof s.data==="function")return s.exists===false?null:s.data();if(s.data&&typeof s.data==="object")return s.data;return s}
 function snapDocs(s){if(!s)return[];const arr=Array.isArray(s)?s:(s.docs||[]);return arr.map(d=>{const v=snapData(d)||{};return {id:d.id||v.id,...v}})}
 
@@ -557,10 +630,11 @@ async function flush(){
 function stats(){
   const m=S.missions,done=m.filter(x=>x.s===2).length,prog=m.filter(x=>x.s===1).length;
   const reg=REGIONS.filter(r=>S.regions[r]).length;
-  const total=m.length+REGIONS.length, got=done+reg;
+  const offDone=CATALOG.filter(x=>S.official[x.id]).length;
+  const total=m.length+REGIONS.length+CATALOG.length, got=done+reg+offDone;
   const pct=total?Math.round(got/total*100):0;
   const reward=m.filter(x=>x.s===2).reduce((a,x)=>a+(+x.r||0),0);
-  return {done,prog,todo:m.length-done-prog,total:m.length,reg,pct,reward};
+  return {done:done+offDone,prog,todo:m.length-done-prog,total:m.length+CATALOG.length,reg,pct,reward,offDone,offTotal:CATALOG.length};
 }
 function badges(){
   const st=stats(),p=S.profile,h=+p.heures||0,a=+p.argent||0;
@@ -591,17 +665,17 @@ function renderCountdown(){
 let DBNEWS=[];
 const safeUrl=u=>/^https:\/\//i.test(String(u||""))?String(u):"#";
 function allNews(){const m=new Map();
-  const live=DBNEWS.filter(n=>n&&n.t&&/^\d{4}-\d{2}-\d{2}/.test(n.d||"")).map(n=>({d:String(n.d).slice(0,10),ts:n.ts||n.d,c:n.c||"Actu",t:n.t,s:n.s||"",sn:n.sn||"Source",su:n.su,live:true}));
+  const live=[...SBNEWS,...DBNEWS].filter(n=>n&&n.t&&/^\d{4}-\d{2}-\d{2}/.test(n.d||"")).map(n=>({d:String(n.d).slice(0,10),ts:n.ts||n.d,c:n.c||"Actu",t:n.t,s:n.s||"",sn:n.sn||"Source",su:n.su,live:true,spoiler:!!n.spoiler}));
   [...live,...NEWS].forEach(n=>{const k=n.t.toLowerCase().trim();if(!m.has(k))m.set(k,n)});
   return [...m.values()].sort((a,b)=>String(b.ts||b.d).localeCompare(String(a.ts||a.d)))}
-function newsItem(n){const f=fmtD(n.d),s=n.src?SRC[n.src]:{n:n.sn,u:safeUrl(n.su)};const fresh=n.live&&n.ts&&(Date.now()-new Date(n.ts))<864e5;return `<div class="news"><div class="d">${f.day} ${esc(f.mon)}<small>${f.y}</small></div><div>${fresh?'<span class="tag g" style="margin-right:6px">Nouveau</span>':""}<span class="tag ${n.c==="Vidéo"?"t":n.c==="Business"?"o":n.c==="Rockstar"?"p":n.c==="Date"?"g":""}">${esc(n.c)}</span><h3 style="margin-top:6px">${esc(n.t)}</h3><p class="small muted">${esc(n.s)}</p><a class="small" href="${s.u}" target="_blank" rel="noopener">Source : ${esc(s.n)} ↗</a></div></div>`}
+function newsItem(n){const f=fmtD(n.d),s=n.src?SRC[n.src]:{n:n.sn,u:safeUrl(n.su)};const fresh=n.live&&n.ts&&(Date.now()-new Date(n.ts))<864e5;return `<div class="news"><div class="d">${f.day} ${esc(f.mon)}<small>${f.y}</small></div><div>${fresh?'<span class="tag g" style="margin-right:6px">Nouveau</span>':""}<span class="tag ${n.c==="Vidéo"?"t":n.c==="Business"?"o":n.c==="Rockstar"?"p":n.c==="Date"?"g":""}">${esc(n.c)}</span>${spoilWrap("n:"+n.t,`<h3 style="margin-top:6px">${esc(n.t)}</h3><p class="small muted">${esc(n.s)}</p>`,n.spoiler)}<a class="small" href="${s.u}" target="_blank" rel="noopener">Source : ${esc(s.n)} ↗</a></div></div>`}
 let newsCat="Tout";
 function renderNews(){
   const ALL=allNews();const cats=["Tout",...new Set(ALL.map(n=>n.c))];
   $("#newsFilters").innerHTML=cats.map(c=>`<button class="chip ${c===newsCat?"on":""}" data-nc="${esc(c)}">${esc(c)}</button>`).join("");
   $("#newsList").innerHTML=ALL.filter(n=>newsCat==="Tout"||n.c===newsCat).map(newsItem).join("");
   $("#homeNews").innerHTML=ALL.slice(0,4).map(newsItem).join("");
-  const last=DBNEWS.map(n=>n&&n.ts).filter(Boolean).sort().pop();
+  renderSpoilBtns();const last=[...SBNEWS,...DBNEWS].map(n=>n&&n.ts).filter(Boolean).sort().pop();
   $("#newsUpd").innerHTML=last?`<i class="dot ok"></i> Fil mis à jour automatiquement toutes les heures · dernière actu ajoutée le ${esc(new Date(last).toLocaleString("fr-FR",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}))}`:`<i class="dot ok"></i> Fil mis à jour automatiquement toutes les heures`;
 }
 function streamerUrl(x){const h=encodeURIComponent(x.h.replace(/^@/,""));return x.p==="YouTube"?`https://www.youtube.com/@${h}/live`:x.p==="Kick"?`https://kick.com/${h}`:x.p==="TikTok"?`https://www.tiktok.com/@${h}/live`:`https://www.twitch.tv/${h}`}
@@ -613,7 +687,7 @@ function renderStreams(){
   $("#langLinks").innerHTML=LANGS.map(([l,u])=>`<a class="btn sm" href="${u}" target="_blank" rel="noopener">${l}</a>`).join("");
   const L=$("#streamerList");
   if(!S.streamers.length){L.innerHTML=`<div class="empty" style="grid-column:1/-1">Aucun streamer pour l'instant. Ajoute ceux que tu suis pour les retrouver en un clic.</div>`;return}
-  L.innerHTML=S.streamers.map(x=>`<div class="card"><div class="strm"><div class="av" style="background:${PCOL[x.p]||"#fff"}">${esc((x.h.replace(/^@/,"")[0]||"?").toUpperCase())}</div><div style="flex:1;min-width:0"><h3 style="overflow:hidden;text-overflow:ellipsis">${esc(x.h)}</h3><div class="small muted">${esc(x.p)}${x.note?" · "+esc(x.note):""}</div></div></div><div class="row" style="margin-top:12px">${EMBED_OK&&x.p==="Twitch"?`<button class="btn sm pri" data-tw="${esc(x.h.replace(/^@/,""))}">▶ Regarder ici</button><a class="btn sm" href="${streamerUrl(x)}" target="_blank" rel="noopener">Ouvrir ↗</a>`:`<a class="btn sm pri" href="${streamerUrl(x)}" target="_blank" rel="noopener">Ouvrir la chaîne</a>`}<button class="btn sm ghost danger" data-delstr="${x.id}">Retirer</button></div></div>`).join("");
+  L.innerHTML=S.streamers.map(x=>`<div class="card"><div class="strm"><div class="av" style="background:${PCOL[x.p]||"#fff"}">${esc((x.h.replace(/^@/,"")[0]||"?").toUpperCase())}</div><div style="flex:1;min-width:0"><h3 style="overflow:hidden;text-overflow:ellipsis">${esc(x.h)}</h3><div class="small muted">${esc(x.p)}${x.note?" · "+esc(x.note):""}</div>${x.p==="Twitch"&&LIVE.configured?(LIVEFAV[x.h.replace(/^@/,"").toLowerCase()]?`<div class="livebadge"><i class="dot live"></i> EN DIRECT · 👁 ${(+LIVEFAV[x.h.replace(/^@/,"").toLowerCase()].viewers).toLocaleString("fr-FR")} · ${esc(LIVEFAV[x.h.replace(/^@/,"").toLowerCase()].game||"")}</div>`:`<div class="small muted">Hors ligne</div>`):""}</div></div><div class="row" style="margin-top:12px">${EMBED_OK&&x.p==="Twitch"?`<button class="btn sm pri" data-tw="${esc(x.h.replace(/^@/,""))}">▶ Regarder ici</button><a class="btn sm" href="${streamerUrl(x)}" target="_blank" rel="noopener">Ouvrir ↗</a>`:`<a class="btn sm pri" href="${streamerUrl(x)}" target="_blank" rel="noopener">Ouvrir la chaîne</a>`}<button class="btn sm ghost danger" data-delstr="${x.id}">Retirer</button></div></div>`).join("");
 }
 function parseVideo(u){
   let x;try{x=new URL(u)}catch(e){return null}
@@ -675,8 +749,16 @@ function renderProfile(){
   $("#badges").innerHTML=badges().map(b=>`<div class="badge ${b.on?"on":""}"><div class="ic">${b.i}</div><div><h3 style="font-size:14px">${esc(b.n)}</h3><div class="small muted">${esc(b.d)}</div></div></div>`).join("");
 }
 let mCat="Toutes";
-function renderMissions(){
+function renderOfficial(){const B=$("#offBox");if(!B)return;
   const st=stats();
+  if(!CATALOG.length){B.innerHTML=`<div class="row" style="justify-content:space-between"><h3>Missions officielles</h3><button class="chip nospoil" data-nospoil></button></div><p class="small muted" style="margin-top:6px">${IN_CLAUDE||backend==="local"?"La liste officielle des missions est disponible sur le site public.":"La liste officielle des missions d'histoire sera ajoutée ici après la sortie du jeu (19 novembre), avec des cases à cocher prêtes à l'emploi. Les titres resteront masqués tant que le mode « sans spoiler » est activé."}</p>`;renderSpoilBtns();return}
+  const groups={};CATALOG.forEach(x=>{const k=x.chapitre!=null?"Chapitre "+x.chapitre:(x.categorie||"Missions");(groups[k]=groups[k]||[]).push(x)});
+  const pct=Math.round(st.offDone/CATALOG.length*100);
+  B.innerHTML=`<div class="row" style="justify-content:space-between"><h3>Missions officielles <span class="muted small">· ${st.offDone}/${CATALOG.length}</span></h3><button class="chip nospoil" data-nospoil></button></div><div class="bar" style="margin:10px 0 14px"><i style="width:${pct}%"></i></div>
+   <div class="grid g2" style="gap:6px 24px">${Object.entries(groups).map(([g,arr])=>`<div><div class="small muted" style="font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin:6px 0">${esc(g)}</div>${arr.map(x=>{const done=!!S.official[x.id];return `<div class="offrow"><button class="chk ${done?"s2":""}" data-off="${esc(x.id)}" style="width:24px;height:24px;flex:none">${done?"✓":""}</button><div style="flex:1;min-width:0">${spoilWrap("m:"+x.id,`<span style="${done?"color:var(--mut);text-decoration:line-through":""}">${esc(x.titre)}</span>`,x.spoiler&&!done)}</div>${x.region?`<span class="small muted">📍 ${esc(x.region)}</span>`:""}</div>`}).join("")}</div>`).join("")}</div>`;
+  renderSpoilBtns()}
+function renderMissions(){
+  const st=stats();renderOfficial();
   $("#mStats").innerHTML=`
    <div class="card"><div class="small muted">Progression globale</div><div class="stat g">${st.pct} %</div><div class="bar"><i style="width:${st.pct}%"></i></div></div>
    <div class="card"><div class="small muted">Terminées</div><div class="stat t">${st.done}<span class="small muted" style="font-family:Inter"> / ${st.total}</span></div></div>
@@ -700,7 +782,7 @@ function renderMissions(){
   $("#homeMissions").innerHTML=cur.length?cur.map(m=>`<div class="row small" style="padding:6px 0;border-bottom:1px dashed var(--line)"><span class="tag ${CATCLS[m.c]||""}">${esc(m.c)}</span>${esc(m.t)}</div>`).join(""):`<p class="small muted">Rien en cours. <a href="#missions" data-go="missions">Ajoute une mission →</a></p>`;
 }
 let LB=[];
-function renderLB(){
+function renderLB(){renderMiniLB();
   const B=$("#lbBox");
   if(backend==="local"){B.innerHTML=`<div class="empty">Le classement communauté n'est pas disponible sur cette version du site.</div>`;return}
   const joinMsg=backend==="supabase"&&!uid?`<div class="notice t" style="margin-bottom:14px"><a href="#compte" data-go="compte">Crée ton compte ou connecte-toi</a>, puis rends ton profil public pour apparaître dans le classement.</div>`:"";
@@ -715,10 +797,130 @@ function renderGuide(){
   $("#faq").innerHTML=FAQ.map(([q,a])=>`<div class="card"><h3 style="margin-bottom:6px">${esc(q)}</h3><p class="small muted">${esc(a)}</p></div>`).join("");
   const seen=new Set();$("#sources").innerHTML=Object.values(SRC).filter(s=>!seen.has(s.u)&&seen.add(s.u)).map(s=>`<li><a href="${s.u}" target="_blank" rel="noopener">${esc(s.n)}</a></li>`).join("");
 }
-function renderAll(){renderAuth();renderAccount();renderNews();renderStreams();renderVideos();renderProfile();renderMissions();renderLB()}
+function renderAll(){renderAuth();renderAccount();renderMap();renderComposer();renderFeed();renderMiniLB();renderNews();renderStreams();renderVideos();renderProfile();renderMissions();renderLB()}
+
+/* ================= CARTE DE LEONIDA ================= */
+const MAPREG=[
+  {n:"Port Gellhorn",c:"#8b5cf6",d:"M40,78 L250,70 L250,158 L180,150 L110,162 L56,150 Z",lx:150,ly:118,info:"Ville portuaire du nord-ouest de Leonida."},
+  {n:"Ambrosia",c:"#3ddc84",d:"M250,70 L430,64 L472,96 L470,188 L420,196 L380,176 L320,166 L250,158 Z",lx:360,ly:122,info:"Région du nord de Leonida."},
+  {n:"Mount Kalaga",c:"#2de2e6",d:"M472,96 L522,100 L602,116 L642,206 L600,262 L522,262 L470,188 Z",lx:556,ly:182,info:"Parc national de Leonida."},
+  {n:"Grassrivers",c:"#ffd23d",d:"M420,196 L470,188 L522,262 L600,262 L604,334 L604,472 L562,474 L522,404 L474,334 L442,264 Z",lx:528,ly:362,info:"Vastes marais, dans l'esprit des Everglades."},
+  {n:"Vice City",c:"#ff3d8b",d:"M600,262 L642,206 L692,334 L722,432 L702,502 L642,544 L592,522 L562,474 L604,472 L604,334 Z",lx:660,ly:420,info:"La grande métropole, inspirée de Miami."},
+  {n:"Leonida Keys",c:"#ff8a3d",d:"M600,566 q14,-6 26,0 q-12,10 -26,0Z M552,582 q16,-7 30,0 q-14,11 -30,0Z M500,596 q16,-7 30,0 q-14,11 -30,0Z M446,606 q16,-7 30,0 q-14,11 -30,0Z M392,612 q16,-7 30,0 q-14,11 -30,0Z",lx:500,ly:640,info:"Archipel d'îles au sud, façon Florida Keys."}
+];
+const PINTYPES=[["collectible","💎","Collectible"],["planque","🏠","Planque"],["garage","🚗","Garage / véhicule"],["mission","🎯","Mission"],["magasin","🛒","Magasin"],["secret","❓","Secret / easter egg"],["autre","📍","Autre"]];
+const PINT=Object.fromEntries(PINTYPES.map(([k,e,l])=>[k,{e,l}]));
+let selReg="Vice City",pinMode=false,pinFilter="tous";
+function renderMap(){const W=$("#mapWrap");if(!W)return;
+  const pins=S.pins.filter(x=>pinFilter==="tous"||x.t===pinFilter);
+  W.classList.toggle("pinmode",pinMode);
+  W.innerHTML=`<svg viewBox="0 0 800 680" id="mapSvg" role="img" aria-label="Carte schématique de Leonida">
+    <defs><pattern id="wv" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M0 20 q10 -6 20 0 t20 0" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="2"/></pattern></defs>
+    <rect width="800" height="680" fill="url(#wv)"/>
+    ${MAPREG.map(r=>`<path class="reg ${r.n===selReg?"sel":""}" data-reg-map="${esc(r.n)}" d="${r.d}" fill="${r.c}" fill-opacity="${S.regions[r.n]?.95:.38}"/>`).join("")}
+    ${MAPREG.map(r=>`<text class="maplbl" x="${r.lx}" y="${r.ly}">${esc(r.n.toUpperCase())}${S.regions[r.n]?" ✓":""}</text>`).join("")}
+    <text x="760" y="40" fill="rgba(255,255,255,.5)" font-size="14" text-anchor="end" font-family="Inter">N ↑</text>
+    ${pins.map(x=>`<g class="pin" data-pin="${esc(x.id)}" transform="translate(${x.x},${x.y})"><circle r="17" fill="#0a0614" stroke="#fff" stroke-width="2"/><text>${PINT[x.t]?.e||"📍"}</text></g>`).join("")}
+  </svg>`;
+  $("#pinHint").textContent=pinMode?"Clique sur la carte pour placer ton épingle":"";
+  $("#pinModeBtn").classList.toggle("pri",pinMode);$("#pinModeBtn").textContent=pinMode?"✕ Annuler":"📍 Placer une épingle";
+  $("#pinFilters").innerHTML=[["tous","Tous"],...PINTYPES.map(([k,e])=>[k,e])].map(([k,l])=>`<button class="chip ${pinFilter===k?"on":""}" data-pinf="${k}">${l}</button>`).join("");
+  const r=MAPREG.find(x=>x.n===selReg)||MAPREG[0],explored=!!S.regions[r.n];
+  $("#regPanel").innerHTML=`<span class="tag" style="background:${r.c}33;color:${r.c}">Région</span><h2 class="display" style="margin:8px 0 4px">${esc(r.n)}</h2><p class="small muted">${esc(r.info)}</p>
+    <button class="btn ${explored?"":"pri"}" style="margin-top:14px;width:100%;justify-content:center" data-reg="${esc(r.n)}">${explored?"✓ Région explorée":"Marquer comme explorée"}</button>
+    <p class="small muted" style="margin-top:10px">Régions explorées : ${REGIONS.filter(x=>S.regions[x]).length}/6</p>`;
+  const L=$("#pinList");
+  L.innerHTML=S.pins.length?S.pins.slice().reverse().map(x=>`<div class="offrow"><span style="font-size:20px">${PINT[x.t]?.e||"📍"}</span><div style="flex:1;min-width:0"><div style="font-weight:600">${esc(x.n||PINT[x.t]?.l||"Épingle")}</div><div class="small muted">${esc(PINT[x.t]?.l||"")}</div></div><button class="btn sm ghost danger" data-delpin="${esc(x.id)}">✕</button></div>`).join(""):`<p class="small muted">Aucune épingle. Clique sur « Placer une épingle », puis sur la carte.</p>`;
+  const svg=$("#mapSvg");
+  svg.addEventListener("click",ev=>{
+    const pg=ev.target.closest("[data-pin]");if(pg&&!pinMode){pinModal(S.pins.find(x=>x.id===pg.dataset.pin));return}
+    if(pinMode){const pt=svg.createSVGPoint();pt.x=ev.clientX;pt.y=ev.clientY;const c=pt.matrixTransform(svg.getScreenCTM().inverse());pinModal(null,Math.round(c.x),Math.round(c.y));return}
+    const rg=ev.target.closest("[data-reg-map]");if(rg){selReg=rg.dataset.regMap;renderMap()}
+  })}
+function pinModal(pin,x,y){const e=pin||{t:"collectible",n:""};
+  modal(`<h2 class="display" style="margin:0 0 12px">${pin?"Épingle":"Nouvelle épingle"}</h2><form class="grid" style="gap:12px">
+    <div><label class="f">Type</label><select name="t">${PINTYPES.map(([k,em,l])=>`<option value="${k}" ${k===e.t?"selected":""}>${em} ${l}</option>`).join("")}</select></div>
+    <div><label class="f">Note</label><input name="n" maxlength="80" value="${esc(e.n)}" placeholder="Ex. : Carte à jouer derrière le motel"></div>
+    <div class="row" style="justify-content:flex-end">${pin?`<button type="button" class="btn danger" id="pinDel">Supprimer</button>`:""}<button type="button" class="btn ghost" data-close>Annuler</button><button class="btn pri">${pin?"Enregistrer":"Ajouter"}</button></div></form>`,fd=>{
+    const o={t:String(fd.get("t")),n:String(fd.get("n")||"").trim().slice(0,80)};
+    if(pin)Object.assign(pin,o);else{S.pins.push({id:uidGen(),x,y,...o});pinMode=false}
+    save();renderMap();toast(pin?"Épingle mise à jour":"Épingle ajoutée")});
+  const d=$("#pinDel");if(d)d.onclick=()=>{S.pins=S.pins.filter(x=>x.id!==pin.id);save();renderMap();$("#modal").classList.remove("on")}}
+
+/* ================= COMMUNAUTÉ ================= */
+let FEED=[],feedEnd=false,MYLIKES=new Set(),feedLoading=false,composerFile=null;
+const shotUrl=p=>`${CFG.supabaseUrl}/storage/v1/object/public/shots/${p}`;
+function communityOn(){return backend==="supabase"}
+function renderComposer(){const C=$("#composer");if(!C)return;
+  if(!communityOn()){C.innerHTML=`<p class="muted">La communauté est disponible sur le site public : <a href="https://xezy-b2.github.io/vice-hub/#communaute" target="_blank" rel="noopener">xezy-b2.github.io/vice-hub</a></p>`;return}
+  if(!uid){C.innerHTML=`<div class="row" style="justify-content:space-between"><span class="muted">Connecte-toi pour publier, aimer et signaler des posts.</span><span class="row" style="gap:8px"><button class="btn sm pri" data-acct-go="signup">Créer mon compte</button><button class="btn sm" data-acct-go="login">Se connecter</button></span></div>`;return}
+  if(C.dataset.uid===uid)return;C.dataset.uid=uid;
+  C.innerHTML=`<form id="postForm" class="grid" style="gap:10px"><div class="row" style="gap:10px;flex-wrap:nowrap;align-items:flex-start">${avatarHtml(ACC?.avatar,ACC?.color,40)}<textarea name="body" rows="3" maxlength="500" placeholder="Une astuce, un moment fort, une question ?" style="flex:1"></textarea></div>
+    <div id="shotPrev"></div>
+    <div class="row" style="justify-content:space-between"><div class="row" style="gap:10px"><label class="btn sm" style="cursor:pointer">🖼️ Capture<input type="file" accept="image/*" id="shotIn" style="display:none"></label><label class="row small" style="gap:6px;cursor:pointer"><input type="checkbox" name="spoiler" style="width:auto"> Spoiler</label></div><div class="row" style="gap:10px"><span class="small muted" id="postCount">0/500</span><button class="btn pri sm">Publier</button></div></div><p class="hint" id="postMsg"></p></form>`;
+  const f=$("#postForm");f.elements.body.oninput=()=>$("#postCount").textContent=f.elements.body.value.length+"/500";
+  $("#shotIn").onchange=async e=>{const file=e.target.files[0];composerFile=null;$("#shotPrev").innerHTML="";if(!file)return;
+    try{composerFile=await prepImage(file);const u=URL.createObjectURL(composerFile.blob);$("#shotPrev").innerHTML=`<div style="position:relative;display:inline-block"><img src="${u}" style="max-height:180px;border-radius:10px;border:1px solid var(--line)"><button type="button" class="btn sm" id="shotRm" style="position:absolute;top:6px;right:6px">✕</button></div>`;$("#shotRm").onclick=()=>{composerFile=null;$("#shotPrev").innerHTML="";$("#shotIn").value=""}}
+    catch(err){toast(err.message||"Image invalide")}};
+  f.onsubmit=async e=>{e.preventDefault();const m=$("#postMsg"),btn=f.querySelector("button.pri"),body=f.elements.body.value.trim();m.className="hint bad";m.textContent="";
+    if(!body){m.textContent="Écris quelque chose avant de publier.";return}
+    btn.disabled=true;let path=null;
+    try{
+      if(composerFile){path=`${uid}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${composerFile.ext}`;const up=await sb.storage.from("shots").upload(path,composerFile.blob,{contentType:composerFile.type,upsert:false});if(up.error)throw up.error}
+      const {error}=await sb.from("posts").insert({body,image_path:path,spoiler:f.elements.spoiler.checked});
+      if(error){if(path)await sb.storage.from("shots").remove([path]);throw error}
+      f.reset();composerFile=null;$("#shotPrev").innerHTML="";$("#postCount").textContent="0/500";toast("Publié !");loadFeed(true)}
+    catch(err){m.textContent=/rate_limited/.test(err.message||"")?"Attends 30 secondes entre deux publications.":frErr(err)}
+    finally{btn.disabled=false}}}
+function prepImage(file){return new Promise((res,rej)=>{
+  if(!/^image\//.test(file.type))return rej(new Error("Choisis une image."));
+  if(file.type==="image/gif"){if(file.size>3145728)return rej(new Error("GIF trop lourd (3 Mo max)."));return res({blob:file,type:"image/gif",ext:"gif"})}
+  const img=new Image(),u=URL.createObjectURL(file);img.onload=()=>{const k=Math.min(1,1600/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext("2d").drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);
+    c.toBlob(b=>{if(!b)return rej(new Error("Image illisible."));if(b.size>3145728)return rej(new Error("Image trop lourde (3 Mo max)."));res({blob:b,type:"image/webp",ext:"webp"})},"image/webp",0.85)};
+  img.onerror=()=>rej(new Error("Image illisible."));img.src=u})}
+async function loadFeed(reset){if(!communityOn()||feedLoading)return;feedLoading=true;
+  try{if(reset){FEED=[];feedEnd=false}
+    let q=sb.from("posts_feed").select("*").order("created_at",{ascending:false}).limit(20);
+    if(FEED.length)q=q.lt("created_at",FEED[FEED.length-1].created_at);
+    const {data,error}=await q;if(error)throw error;
+    FEED=FEED.concat(data||[]);if((data||[]).length<20)feedEnd=true;
+    if(uid&&FEED.length){const ids=FEED.map(x=>x.id);const r=await sb.from("post_likes").select("post_id").eq("user_id",uid).in("post_id",ids);MYLIKES=new Set((r.data||[]).map(x=>x.post_id))}else MYLIKES=new Set();
+  }catch(e){$("#feed").innerHTML=`<div class="empty">Impossible de charger le fil (${esc(frErr(e))}).</div>`;feedLoading=false;return}
+  feedLoading=false;renderFeed()}
+function renderFeed(){const F=$("#feed");if(!F)return;renderSpoilBtns();
+  if(!communityOn()){F.innerHTML=`<div class="empty">Le fil communauté est disponible sur le site public.</div>`;$("#feedMore").style.display="none";return}
+  if(!FEED.length){F.innerHTML=`<div class="empty">Aucun post pour l'instant. Sois le premier à partager quelque chose !</div>`;$("#feedMore").style.display="none";return}
+  F.innerHTML=FEED.map(x=>{const mine=uid&&x.user_id===uid,liked=MYLIKES.has(x.id);
+    const content=`<div class="body">${esc(x.body)}</div>${x.image_path?`<img class="shot" loading="lazy" src="${esc(shotUrl(x.image_path))}" alt="Capture partagée par ${esc(x.username)}" data-zoom="${esc(shotUrl(x.image_path))}">`:""}`;
+    return `<div class="post"><div data-pp="${esc(x.user_id)}" style="cursor:pointer">${avatarHtml(x.avatar,x.color,44)}</div><div style="min-width:0"><div class="row" style="gap:8px"><b data-pp="${esc(x.user_id)}" style="cursor:pointer">${esc(x.username)}</b><span class="small muted">${esc(timeAgo(x.created_at))}</span>${x.spoiler?'<span class="tag o">Spoiler</span>':""}</div>
+      ${spoilWrap("p:"+x.id,content,x.spoiler)}
+      <div class="row" style="gap:6px;margin-top:10px"><button class="btn sm likebtn ${liked?"on":""}" data-like="${x.id}">${liked?"♥":"♡"} ${x.likes||0}</button>${mine?`<button class="btn sm ghost danger" data-delpost="${x.id}">Supprimer</button>`:uid?`<button class="btn sm ghost" data-report="${x.id}">Signaler</button>`:""}</div></div></div>`}).join("");
+  $("#feedMore").style.display=feedEnd?"none":""}
+async function toggleLike(id){if(!uid){toast("Connecte-toi pour aimer un post");return}const post=FEED.find(x=>x.id===id);if(!post)return;
+  const liked=MYLIKES.has(id);
+  if(liked){MYLIKES.delete(id);post.likes--}else{MYLIKES.add(id);post.likes++}renderFeed();
+  const r=liked?await sb.from("post_likes").delete().eq("post_id",id).eq("user_id",uid):await sb.from("post_likes").insert({post_id:id});
+  if(r.error){if(liked){MYLIKES.add(id);post.likes++}else{MYLIKES.delete(id);post.likes--}renderFeed();toast(frErr(r.error))}}
+function renderMiniLB(){const M=$("#miniLB");if(!M)return;const rows=[...LB].sort((a,b)=>(b.pct||0)-(a.pct||0)).slice(0,5);
+  M.innerHTML=rows.length?rows.map((r,i)=>`<div class="offrow" data-pp="${esc(r.id)}" style="cursor:pointer"><span class="rank" style="width:22px">${i+1}</span>${avatarHtml(r.avatar,r.color,30)}<b style="flex:1">${esc(r.pseudo)}</b><span class="small muted">${r.pct||0} %</span></div>`).join(""):`<p class="small muted">Personne au classement pour l'instant.</p>`}
+
+/* ================= LIVE TWITCH ================= */
+const liveUrl=q=>`${CFG.supabaseUrl}/functions/v1/twitch-live?${q}`;
+async function fetchLive(){if(IN_CLAUDE||!CFG.supabaseUrl)return;
+  try{const r=await fetch(liveUrl("top=1"+(liveLang?"&lang="+liveLang:"")),{headers:{apikey:CFG.supabaseAnonKey}});LIVE=await r.json()}catch(e){LIVE={configured:false,streams:[]}}
+  const logins=S.streamers.filter(x=>x.p==="Twitch").map(x=>x.h.replace(/^@/,"").toLowerCase()).filter(l=>/^[a-z0-9_]{2,25}$/.test(l));
+  if(LIVE.configured&&logins.length){try{const r=await fetch(liveUrl("logins="+logins.join(",")),{headers:{apikey:CFG.supabaseAnonKey}});const j=await r.json();LIVEFAV={};(j.streams||[]).forEach(s=>LIVEFAV[s.login.toLowerCase()]=s)}catch(e){}}
+  renderLive();renderStreams()}
+function renderLive(){const S1=$("#liveSection");if(!S1)return;
+  if(!LIVE.configured){S1.style.display="none";$("#streamNotice").style.display="";return}
+  S1.style.display="";$("#streamNotice").style.display="none";
+  $("#liveLang").innerHTML=[["","Toutes langues"],["fr","FR"],["en","EN"],["es","ES"],["pt","PT"],["de","DE"]].map(([k,l])=>`<button class="chip ${liveLang===k?"on":""}" data-livelang="${k}">${l}</button>`).join("");
+  const G=$("#liveGrid");
+  G.innerHTML=(LIVE.streams||[]).length?LIVE.streams.slice(0,12).map(s=>`<div class="card hov livecard" data-tw="${esc(s.login)}" ${EMBED_OK?"":`data-twlink="${esc(s.login)}"`}><div class="th" style="background-image:url('${esc(s.thumb)}?t=${Math.floor(Date.now()/120000)}')"><span class="lv">LIVE</span><span class="vw">👁 ${(+s.viewers||0).toLocaleString("fr-FR")}</span></div><div class="bd"><b>${esc(s.name)}</b><div class="small muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.title)}</div></div></div>`).join(""):`<div class="empty" style="grid-column:1/-1">${LIVE.game===false?"La catégorie GTA VI n'est pas encore active sur Twitch.":"Aucun live GTA VI dans cette langue pour le moment."}</div>`;
+  const H=$("#homeStreams");if(H&&(LIVE.streams||[]).length){H.innerHTML=LIVE.streams.slice(0,4).map(s=>`<button class="btn" data-tw="${esc(s.login)}" style="justify-content:space-between"><span class="row" style="gap:10px;flex-wrap:nowrap;min-width:0"><i class="dot live"></i><b>${esc(s.name)}</b></span><span class="small muted">👁 ${(+s.viewers||0).toLocaleString("fr-FR")}</span></button>`).join("")+`<button class="btn sm ghost" data-go="streams">Tous les lives →</button>`}}
 
 /* ---------------- ROUTING ---------------- */
-const VIEWS=["accueil","actus","streams","videos","missions","classement","guide","compte"];
+const VIEWS=["accueil","actus","streams","videos","missions","carte","communaute","classement","guide","compte"];
 function go(v){if(v==="profil")v="compte";const authHash=/access_token|error_description/.test(location.hash);if(!VIEWS.includes(v))v="accueil";$$("section.view").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));$$(".tab").forEach(t=>t.classList.toggle("on",t.dataset.go===v));if(!authHash&&location.hash!=="#"+v){try{history.replaceState(null,"","#"+v)}catch(e){location.hash=v}}window.scrollTo({top:0,behavior:"smooth"})}
 window.addEventListener("hashchange",()=>go(location.hash.slice(1)));
 
@@ -749,9 +951,20 @@ function missionModal(m){
 
 /* ---------------- EVENTS ---------------- */
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-av],[data-col],[data-acct-go],[data-acct],[data-oauth],[data-pp],[data-tw],[data-play],[data-go],[data-nc],[data-mc],[data-cyc],[data-edm],[data-delm],[data-reg],[data-lch],[data-delstr],[data-seen],[data-delvid],[data-add-m]");
+  const t=e.target.closest("[data-nospoil],[data-reveal],[data-off],[data-pinf],[data-delpin],[data-like],[data-delpost],[data-report],[data-zoom],[data-livelang],[data-twlink],[data-av],[data-col],[data-acct-go],[data-acct],[data-oauth],[data-pp],[data-tw],[data-play],[data-go],[data-nc],[data-mc],[data-cyc],[data-edm],[data-delm],[data-reg],[data-lch],[data-delstr],[data-seen],[data-delvid],[data-add-m]");
   if(!t)return;const d=t.dataset;
-  if(d.av&&PICK){PICK.avatar=d.av;renderProfile()}
+  if("nospoil" in d){S.settings.noSpoil=!S.settings.noSpoil;REVEALED.clear();save();renderFeed();renderOfficial()}
+  else if(d.reveal){REVEALED.add(d.reveal);renderNews();renderFeed();renderOfficial()}
+  else if(d.off){S.official[d.off]=!S.official[d.off];if(!S.official[d.off])delete S.official[d.off];save()}
+  else if(d.pinf){pinFilter=d.pinf;renderMap()}
+  else if(d.delpin){S.pins=S.pins.filter(x=>x.id!==d.delpin);save();renderMap()}
+  else if(d.like){toggleLike(+d.like)}
+  else if(d.delpost){const post=FEED.find(x=>x.id===+d.delpost);modal(`<h3>Supprimer ce post ?</h3><p class="small muted" style="margin:8px 0 16px">Il sera retiré définitivement du fil.</p><div class="row" style="justify-content:flex-end"><button class="btn ghost" data-close>Annuler</button><button class="btn pri" id="cfp">Supprimer</button></div>`);$("#cfp").onclick=async()=>{const {error}=await sb.from("posts").delete().eq("id",+d.delpost);if(error){toast(frErr(error));return}if(post&&post.image_path)await sb.storage.from("shots").remove([post.image_path]);$("#modal").classList.remove("on");FEED=FEED.filter(x=>x.id!==+d.delpost);renderFeed();toast("Post supprimé")}}
+  else if(d.report){modal(`<h3>Signaler ce post</h3><form class="grid" style="gap:10px;margin-top:10px"><select name="r"><option>Contenu offensant</option><option>Spoiler non signalé</option><option>Spam / pub</option><option>Autre</option></select><div class="row" style="justify-content:flex-end"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn pri">Signaler</button></div></form>`,fd=>{sb.from("post_reports").insert({post_id:+d.report,reason:String(fd.get("r"))}).then(({error})=>toast(error?(/duplicate/.test(error.message)?"Tu as déjà signalé ce post":frErr(error)):"Merci, le post a été signalé"))})}
+  else if(d.zoom){modal(`<img src="${esc(d.zoom)}" style="width:100%;border-radius:12px"><div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" data-close>Fermer</button></div>`)}
+  else if("livelang" in d){liveLang=d.livelang;fetchLive()}
+  else if(d.twlink){window.open("https://www.twitch.tv/"+encodeURIComponent(d.twlink),"_blank","noopener")}
+  else if(d.av&&PICK){PICK.avatar=d.av;renderProfile()}
   else if(d.col&&PICK){PICK.color=d.col;renderProfile()}
   else if(d.acctGo){accTab=d.acctGo;renderAccount(true);go("compte")}
   else if(d.acct){e.preventDefault();accTab=d.acct;renderAccount(true)}
@@ -777,7 +990,7 @@ $("#mSearch").oninput=renderMissions;$("#mStatus").onchange=renderMissions;
 $("#addStreamerBtn").onclick=()=>modal(`<h2 class="display" style="margin:0 0 14px">Ajouter un streamer</h2><form class="grid" style="gap:12px">
   <div><label class="f">Pseudo de la chaîne</label><input name="h" required maxlength="40" placeholder="nom_de_la_chaine"></div>
   <div class="grid g2" style="gap:12px"><div><label class="f">Plateforme</label><select name="p"><option>Twitch</option><option>YouTube</option><option>Kick</option><option>TikTok</option></select></div><div><label class="f">Note (facultatif)</label><input name="note" maxlength="30" placeholder="RP, speedrun…"></div></div>
-  <div class="row" style="justify-content:flex-end"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn pri">Ajouter</button></div></form>`,fd=>{const h=fd.get("h").trim().replace(/\s+/g,"");if(!h)return false;S.streamers.push({id:uidGen(),h,p:fd.get("p"),note:fd.get("note").trim()});save();toast("Streamer ajouté")});
+  <div class="row" style="justify-content:flex-end"><button type="button" class="btn ghost" data-close>Annuler</button><button class="btn pri">Ajouter</button></div></form>`,fd=>{const h=fd.get("h").trim().replace(/\s+/g,"");if(!h)return false;S.streamers.push({id:uidGen(),h,p:fd.get("p"),note:fd.get("note").trim()});save();toast("Streamer ajouté");fetchLive()});
 $("#addVideoBtn").onclick=()=>modal(`<h2 class="display" style="margin:0 0 14px">Ajouter une vidéo</h2><form class="grid" style="gap:12px">
   <div><label class="f">Lien</label><input name="u" required type="url" placeholder="https://www.youtube.com/watch?v=…"></div>
   <div><label class="f">Titre (facultatif)</label><input name="t" maxlength="90" placeholder="Analyse complète du trailer 2"></div>
@@ -963,7 +1176,7 @@ async function publicProfile(id){
     <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Fermer</button></div>`)}
 async function sbSession(session){
   const prev=uid;uid=session&&session.user?session.user.id:null;sbUser=session?session.user:null;sbEmail=sbUser?sbUser.email||"":"";
-  if(!uid){ACC=null;renderAuth();renderAccount();renderProfile();setSave("warn","Non connecté · sauvegarde locale");renderLB();return}
+  if(!uid){ACC=null;$("#composer").dataset.uid="";renderComposer();MYLIKES=new Set();renderFeed();renderAuth();renderAccount();renderProfile();setSave("warn","Non connecté · sauvegarde locale");renderLB();return}
   if(prev===uid){renderAuth();return}
   setSave("","Synchronisation…");
   try{
@@ -972,7 +1185,7 @@ async function sbSession(session){
     const remote=data&&data.state;
     if(remote&&remote.updated&&remote.updated>=(S.updated||0))S=norm(remote);
     if(ACC){S.profile.pseudo=ACC.username;if(ACC.bio&&!S.profile.bio)S.profile.bio=ACC.bio}
-    lsSet();renderAll();await flush();setSave("ok","Synchronisé");fetchLB();
+    lsSet();renderAll();await flush();setSave("ok","Synchronisé");fetchLB();loadFeed(true);
     if(FROM_AUTH_LINK||location.hash==="#compte")go("compte")
   }catch(e){setSave("warn","Erreur de synchro · local")}
   renderAuth();renderAccount()}
@@ -982,18 +1195,23 @@ const local=lsGet();if(local)S=norm(local);
 renderGuide();renderAll();go(location.hash.slice(1)||"accueil");renderCountdown();setInterval(renderCountdown,1000);
 setSave("","Connexion…");
 $("#authBtn").onclick=authModal;
+$("#pinModeBtn").onclick=()=>{pinMode=!pinMode;renderMap()};
+$("#feedRefresh").onclick=()=>loadFeed(true);$("#feedMore").onclick=()=>loadFeed(false);
 if(EMBED_OK){$("#twitchPlayerWrap").style.display="";$("#vidPlayerWrap").style.display="";$("#twGo").onclick=()=>playTwitch($("#twCh").value);$("#twCh").onkeydown=e=>{if(e.key==="Enter")playTwitch($("#twCh").value)};$("#vidGo").onclick=()=>playVideo($("#vidUrl").value.trim());$("#vidUrl").onkeydown=e=>{if(e.key==="Enter")playVideo($("#vidUrl").value.trim())};$("#vidBox").innerHTML='<div class="empty">Colle un lien YouTube ou Twitch, ou clique « Lire ici » dans ta watchlist.</div>'}
 async function bootSupabase(){
   if(!CFG.supabaseUrl||!CFG.supabaseAnonKey||!window.supabase){backend="local";setSave("warn","Sauvegarde locale");renderLB();return}
   const hashErr=/error_description=([^&]+)/.exec(location.hash);
   try{sb=window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey,{auth:{flowType:"implicit",persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}catch(e){backend="local";setSave("warn","Sauvegarde locale");return}
   backend="supabase";renderAuth();renderAccount();renderLB();fetchLB();setInterval(fetchLB,60000);
+  fetchSbNews();setInterval(fetchSbNews,300000);fetchCatalog();loadFeed(true);setInterval(()=>{if(location.hash==="#communaute")loadFeed(true)},90000);renderComposer();
   if(hashErr){const m=decodeURIComponent(hashErr[1].replace(/\+/g," "));setTimeout(()=>{toast(/expired|invalid/i.test(m)?"Lien expiré ou déjà utilisé : demande-en un nouveau":"Connexion impossible : "+m);try{history.replaceState(null,"",BASE+"#compte")}catch(e){}go("compte")},400)}
   sb.auth.onAuthStateChange((ev,session)=>{if(ev==="PASSWORD_RECOVERY")setTimeout(recoveryModal,400);setTimeout(()=>sbSession(session),0)});
   try{const {data}=await sb.auth.getSession();await sbSession(data&&data.session)}catch(e){sbSession(null)}
   setTimeout(()=>{if(/access_token|error_description/.test(location.hash)){try{history.replaceState(null,"",BASE+"#"+(uid?"compte":"accueil"))}catch(e){}}},1500);
 }
-if(!IN_CLAUDE){fetchNewsJson();setInterval(fetchNewsJson,600000)}
+if(!IN_CLAUDE){fetchNewsJson();setInterval(fetchNewsJson,600000);fetchLive();setInterval(fetchLive,120000)}
+async function fetchSbNews(){try{const {data,error}=await sb.from("news").select("*").order("ts",{ascending:false}).limit(200);if(!error){SBNEWS=data||[];renderNews()}}catch(e){}}
+async function fetchCatalog(){try{const {data,error}=await sb.from("missions_catalog").select("*").order("chapitre",{ascending:true,nullsFirst:false}).order("ordre");if(!error){CATALOG=data||[];renderMissions();renderAccount()}}catch(e){}}
 (async()=>{
   try{
     const w=window.claude;if(!w||typeof w.use!=="function")throw 0;
