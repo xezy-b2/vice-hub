@@ -1,3 +1,5 @@
+<img src="logo.svg" width="96" alt="VICE HUB">
+
 # VICE HUB — Le QG GTA 6
 
 Site de fans (non officiel) dédié à Grand Theft Auto VI : actualités sourcées mises à jour automatiquement, lecteur Twitch/YouTube intégré, vidéos officielles, profil joueur, suivi des missions, badges, classement communauté et guide de lancement.
