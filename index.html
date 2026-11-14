@@ -568,7 +568,7 @@ const LANGS = [
   ["🇩🇪 Deutsch","https://www.youtube.com/results?search_query=GTA+6+live+deutsch&sp=EgJAAQ%253D%253D"],
   ["🇮🇹 Italiano","https://www.youtube.com/results?search_query=GTA+6+live+ita&sp=EgJAAQ%253D%253D"]
 ];
-const REGIONS = ["Vice City","Leonida Keys","Grassrivers","Port Gellhorn","Ambrosia","Mount Kalaga"];
+let REGIONS = ["Vice City","Leonida Keys","Grassrivers","Port Gellhorn","Ambrosia","Mount Kalaga"];
 const LAUNCH = ["Précommander le jeu","Lancer le préchargement (212 Go)","Libérer de l'espace sur la console","Mettre la console à jour","Prévoir snacks et boissons","Poser son jour de congé 😏","Prévenir ses potes du créneau"];
 const CATS = ["Histoire","Braquage","Annexe","Activité","Collectible","Défi perso"];
 const CATCLS = {"Histoire":"","Braquage":"o","Annexe":"t","Activité":"p","Collectible":"g","Défi perso":"o"};
@@ -642,7 +642,7 @@ function badges(){
   return [
     {i:"🪪",n:"Nouveau citoyen",d:"Choisir un pseudo",on:!!p.pseudo},
     {i:"🌴",n:"Bienvenue à Vice",d:"Explorer Vice City",on:!!S.regions["Vice City"]},
-    {i:"🗺️",n:"Cartographe",d:"Explorer les 6 régions",on:st.reg===6},
+    {i:"🗺️",n:"Cartographe",d:"Explorer toutes les régions",on:st.reg===REGIONS.length},
     {i:"🎬",n:"Premier contrat",d:"Terminer 1 mission",on:st.done>=1},
     {i:"🔥",n:"Enchaîneur",d:"Terminer 10 missions",on:st.done>=10},
     {i:"👑",n:"Légende de Leonida",d:"Terminer 50 missions",on:st.done>=50},
@@ -745,7 +745,7 @@ function renderProfile(){
     <div class="card" style="background:var(--bg2);padding:12px"><div class="small muted">Heures de jeu</div><div class="stat g">${(+p.heures||0).toLocaleString("fr-FR")} h</div></div>
     <div class="card" style="background:var(--bg2);padding:12px"><div class="small muted">Argent</div><div class="stat t" style="font-size:34px">${money(p.argent)}</div></div>
    </div>
-   <div class="small muted" style="margin-top:12px">Style : ${esc(p.style)}${p.debut?" · Début : "+esc(new Date(p.debut).toLocaleDateString("fr-FR")):""} · Régions explorées : ${st.reg}/6 · ${p.public?'<span style="color:var(--green)">Profil public</span>':"Profil privé"}</div>`;
+   <div class="small muted" style="margin-top:12px">Style : ${esc(p.style)}${p.debut?" · Début : "+esc(new Date(p.debut).toLocaleDateString("fr-FR")):""} · Régions explorées : ${st.reg}/${REGIONS.length} · ${p.public?'<span style="color:var(--green)">Profil public</span>':"Profil privé"}</div>`;
   $("#badges").innerHTML=badges().map(b=>`<div class="badge ${b.on?"on":""}"><div class="ic">${b.i}</div><div><h3 style="font-size:14px">${esc(b.n)}</h3><div class="small muted">${esc(b.d)}</div></div></div>`).join("");
 }
 let mCat="Toutes";
@@ -800,7 +800,7 @@ function renderGuide(){
 function renderAll(){renderAuth();renderAccount();renderMap();renderComposer();renderFeed();renderMiniLB();renderNews();renderStreams();renderVideos();renderProfile();renderMissions();renderLB()}
 
 /* ================= CARTE DE LEONIDA ================= */
-const MAPREG=[
+let MAPREG=[
   {n:"Port Gellhorn",c:"#8b5cf6",d:"M40,78 L250,70 L250,158 L180,150 L110,162 L56,150 Z",lx:150,ly:118,info:"Ville portuaire du nord-ouest de Leonida."},
   {n:"Ambrosia",c:"#3ddc84",d:"M250,70 L430,64 L472,96 L470,188 L420,196 L380,176 L320,166 L250,158 Z",lx:360,ly:122,info:"Région du nord de Leonida."},
   {n:"Mount Kalaga",c:"#2de2e6",d:"M472,96 L522,100 L602,116 L642,206 L600,262 L522,262 L470,188 Z",lx:556,ly:182,info:"Parc national de Leonida."},
@@ -828,7 +828,7 @@ function renderMap(){const W=$("#mapWrap");if(!W)return;
   const r=MAPREG.find(x=>x.n===selReg)||MAPREG[0],explored=!!S.regions[r.n];
   $("#regPanel").innerHTML=`<span class="tag" style="background:${r.c}33;color:${r.c}">Région</span><h2 class="display" style="margin:8px 0 4px">${esc(r.n)}</h2><p class="small muted">${esc(r.info)}</p>
     <button class="btn ${explored?"":"pri"}" style="margin-top:14px;width:100%;justify-content:center" data-reg="${esc(r.n)}">${explored?"✓ Région explorée":"Marquer comme explorée"}</button>
-    <p class="small muted" style="margin-top:10px">Régions explorées : ${REGIONS.filter(x=>S.regions[x]).length}/6</p>`;
+    <p class="small muted" style="margin-top:10px">Régions explorées : ${REGIONS.filter(x=>S.regions[x]).length}/${REGIONS.length}</p>`;
   const L=$("#pinList");
   L.innerHTML=S.pins.length?S.pins.slice().reverse().map(x=>`<div class="offrow"><span style="font-size:20px">${PINT[x.t]?.e||"📍"}</span><div style="flex:1;min-width:0"><div style="font-weight:600">${esc(x.n||PINT[x.t]?.l||"Épingle")}</div><div class="small muted">${esc(PINT[x.t]?.l||"")}</div></div><button class="btn sm ghost danger" data-delpin="${esc(x.id)}">✕</button></div>`).join(""):`<p class="small muted">Aucune épingle. Clique sur « Placer une épingle », puis sur la carte.</p>`;
   const svg=$("#mapSvg");
@@ -1203,7 +1203,7 @@ async function bootSupabase(){
   const hashErr=/error_description=([^&]+)/.exec(location.hash);
   try{sb=window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseAnonKey,{auth:{flowType:"implicit",persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}catch(e){backend="local";setSave("warn","Sauvegarde locale");return}
   backend="supabase";renderAuth();renderAccount();renderLB();fetchLB();setInterval(fetchLB,60000);
-  fetchSbNews();setInterval(fetchSbNews,300000);fetchCatalog();loadFeed(true);setInterval(()=>{if(location.hash==="#communaute")loadFeed(true)},90000);renderComposer();
+  fetchSbNews();setInterval(fetchSbNews,300000);fetchCatalog();fetchMap();loadFeed(true);setInterval(()=>{if(location.hash==="#communaute")loadFeed(true)},90000);renderComposer();
   if(hashErr){const m=decodeURIComponent(hashErr[1].replace(/\+/g," "));setTimeout(()=>{toast(/expired|invalid/i.test(m)?"Lien expiré ou déjà utilisé : demande-en un nouveau":"Connexion impossible : "+m);try{history.replaceState(null,"",BASE+"#compte")}catch(e){}go("compte")},400)}
   sb.auth.onAuthStateChange((ev,session)=>{if(ev==="PASSWORD_RECOVERY")setTimeout(recoveryModal,400);setTimeout(()=>sbSession(session),0)});
   try{const {data}=await sb.auth.getSession();await sbSession(data&&data.session)}catch(e){sbSession(null)}
@@ -1211,6 +1211,8 @@ async function bootSupabase(){
 }
 if(!IN_CLAUDE){fetchNewsJson();setInterval(fetchNewsJson,600000);fetchLive();setInterval(fetchLive,120000)}
 async function fetchSbNews(){try{const {data,error}=await sb.from("news").select("*").order("ts",{ascending:false}).limit(200);if(!error){SBNEWS=data||[];renderNews()}}catch(e){}}
+async function fetchMap(){try{const {data,error}=await sb.from("map_regions").select("*").order("ordre");if(error||!data||!data.length)return;
+  MAPREG=data.map(r=>({n:r.name,c:r.color,d:r.path,lx:r.lx,ly:r.ly,info:r.info}));REGIONS=MAPREG.map(r=>r.n);if(!REGIONS.includes(selReg))selReg=REGIONS[0];renderAll()}catch(e){}}
 async function fetchCatalog(){try{const {data,error}=await sb.from("missions_catalog").select("*").order("chapitre",{ascending:true,nullsFirst:false}).order("ordre");if(!error){CATALOG=data||[];renderMissions();renderAccount()}}catch(e){}}
 (async()=>{
   try{
